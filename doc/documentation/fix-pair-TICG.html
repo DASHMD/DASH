@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>TICG pair potential &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="DSF Charge Pair potential" href="fix-charge-DSF.html" />
+    <link rel="prev" title="Force shifted LJ Pair potential" href="fix-pair-LJFS.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fix-charge-DSF.html" title="DSF Charge Pair potential"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fix-pair-LJFS.html" title="Force shifted LJ Pair potential"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="ticg-pair-potential">
+<h1>TICG pair potential<a class="headerlink" href="#ticg-pair-potential" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Define a pair potential energy function corresponding to the soft core repulsive potential with energy proportional to volume of intersecting spheres</p>
+<div class="math">
+\[\begin{split}V(r_{ij}) =  \left[\begin{array}{cc} -C\frac{(r_{ij} - 2 R)^2 (r_{ij} + 4 R)}{16 R^3}, &amp; r&lt;r_{\rm cut}\\
+                 0, &amp; r\geq r_{\rm cut}
+                 \end{array}\right.\end{split}\]</div>
+<p>where <span class="math">\(r_{ij}\)</span> is the distance between particles <span class="math">\(i,j\)</span> <span class="math">\(C\)</span> is potential strength, <span class="math">\(R\)</span> is the sphere radius. Note that cutoff distance is two times <span class="math">\(R\)</span>.</p>
+<p>parameters of potential can be defined directly within the python input script or read from a restart file.</p>
+</div>
+<div class="section" id="python-member-functions">
+<h2>Python Member Functions<a class="headerlink" href="#python-member-functions" title="Permalink to this headline">¶</a></h2>
+<p>Adding Fix</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">FixTICG</span><span class="p">(</span><span class="n">state</span><span class="o">=...</span><span class="p">,</span> <span class="n">handle</span><span class="o">=...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">state</span></tt></dt>
+<dd>state object to add the fix.</dd>
+<dt><tt class="docutils literal"><span class="pre">handle</span></tt></dt>
+<dd>A name for the fix.</dd>
+</dl>
+<p>Setting parameters from within the Python environment is done with <tt class="docutils literal"><span class="pre">setParameter</span></tt>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">setParameter</span><span class="p">(</span><span class="n">param</span><span class="o">=...</span><span class="p">,</span><span class="n">handleA</span><span class="o">=...</span><span class="p">,</span><span class="n">handleB</span><span class="o">=...</span><span class="p">,</span><span class="n">val</span><span class="o">=...</span><span class="p">,)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">param</span></tt></dt>
+<dd><p class="first">name of parameter to set. Can be <tt class="docutils literal"><span class="pre">C</span></tt>, <tt class="docutils literal"><span class="pre">rCut</span></tt>.</p>
+<p class="last"><tt class="docutils literal"><span class="pre">rCut</span></tt> parameter has a default value equal to <tt class="docutils literal"><span class="pre">state.rCut</span></tt>. Note that <tt class="docutils literal"><span class="pre">R</span></tt> is half of <tt class="docutils literal"><span class="pre">rCut</span></tt>.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">handleA</span></tt>, <tt class="docutils literal"><span class="pre">handleB</span></tt></dt>
+<dd>a pair of type names to set parameters.</dd>
+<dt><tt class="docutils literal"><span class="pre">val</span></tt></dt>
+<dd>value of the parameter.</dd>
+</dl>
+<p>it is possible to get value of the parameters within the Python environment with <tt class="docutils literal"><span class="pre">getParameter</span></tt>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">val</span> <span class="o">=</span> <span class="n">getParameter</span><span class="p">(</span><span class="n">param</span><span class="o">=...</span><span class="p">,</span><span class="n">handleA</span><span class="o">=...</span><span class="p">,</span><span class="n">handleB</span><span class="o">=...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">param</span></tt></dt>
+<dd>name of parameter to set. Can be <tt class="docutils literal"><span class="pre">C</span></tt>, <tt class="docutils literal"><span class="pre">rCut</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">handleA</span></tt>, <tt class="docutils literal"><span class="pre">handleB</span></tt></dt>
+<dd>pair of type names to set parameters for.</dd>
+<dt><tt class="docutils literal"><span class="pre">val</span></tt></dt>
+<dd>value of the  parameter.</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Adding the fix</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#adding  TICG potential</span>
+<span class="n">ticg</span> <span class="o">=</span> <span class="n">FixTICG</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="s">&#39;TICG&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Setting parameters in python</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ticg</span><span class="o">.</span><span class="n">setParameter</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="s">&#39;eps&#39;</span><span class="p">,</span> <span class="n">handleA</span><span class="o">=</span><span class="s">&#39;A&#39;</span><span class="p">,</span> <span class="n">handleB</span><span class="o">=</span><span class="s">&#39;B&#39;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">ticg</span><span class="o">.</span><span class="n">setParameter</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="s">&#39;sig&#39;</span><span class="p">,</span> <span class="n">handleA</span><span class="o">=</span><span class="s">&#39;B&#39;</span><span class="p">,</span> <span class="n">handleB</span><span class="o">=</span><span class="s">&#39;B&#39;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Setting same parameters for all types in python</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#list of all types</span>
+<span class="n">types</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">,</span><span class="s">&#39;B&#39;</span><span class="p">,</span><span class="s">&#39;C&#39;</span><span class="p">,</span><span class="s">&#39;S&#39;</span><span class="p">,</span><span class="s">&#39;P&#39;</span><span class="p">,</span><span class="s">&#39;N&#39;</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">A</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
+<span class="k">for</span> <span class="n">B</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
+    <span class="n">ticg</span><span class="o">.</span><span class="n">setParameter</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="n">handleA</span><span class="o">=</span><span class="n">A</span><span class="p">,</span> <span class="n">handleB</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">ticg</span><span class="o">.</span><span class="n">setParameter</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="s">&#39;rCut&#39;</span><span class="p">,</span> <span class="n">handleA</span><span class="o">=</span><span class="n">A</span><span class="p">,</span> <span class="n">handleB</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Activating the fix</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Activate fix</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">ticg</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="lammps-data-file-parameter-order">
+<h2>LAMMPS data file parameter order<a class="headerlink" href="#lammps-data-file-parameter-order" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><tt class="docutils literal"><span class="pre">rCut</span></tt>, <tt class="docutils literal"><span class="pre">C</span></tt></div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">TICG pair potential</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#python-member-functions">Python Member Functions</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#lammps-data-file-parameter-order">LAMMPS data file parameter order</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fix-pair-LJFS.html"
+                        title="previous chapter">Force shifted LJ Pair potential</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fix-charge-DSF.html"
+                        title="next chapter">DSF Charge Pair potential</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/fix-pair-TICG.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="fix-charge-DSF.html" title="DSF Charge Pair potential"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fix-pair-LJFS.html" title="Force shifted LJ Pair potential"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

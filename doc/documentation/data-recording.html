@@ -1,0 +1,269 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Recording Data &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="Writing Trajectories" href="writing-trajectories.html" />
+    <link rel="prev" title="Simulation State" href="state.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="writing-trajectories.html" title="Writing Trajectories"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="state.html" title="Simulation State"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="recording-data">
+<h1>Recording Data<a class="headerlink" href="#recording-data" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Several types of data can be recorded using GPU-accelerated methods in DASH, including energies on an aggregate or fine-grained bases, temperature, kinetic energy, pressture, virial coefficients, volume, and simulation boundaries.  Other data types can be recorded via <a class="reference internal" href="python-operation.html"><em>Python Operation</em></a> with minimal performance overhead.</p>
+</div>
+<div class="section" id="id1">
+<h2>Recording data<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">dataManager</span></tt> member of <tt class="docutils literal"><span class="pre">State</span></tt> handles data recording.  To record temperature of all atoms, for instance, one would write</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#record temperature every 100 turns</span>
+<span class="n">temperatureData</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">dataManager</span><span class="o">.</span><span class="n">recordTemperature</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="n">integrater</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c">#print python list of recorded temperatures</span>
+<span class="k">print</span> <span class="n">temperature</span><span class="o">.</span><span class="n">vals</span>
+<span class="c">#print python list of turns on which these values were recorded</span>
+<span class="k">print</span> <span class="n">temperature</span><span class="o">.</span><span class="n">turns</span>
+</pre></div>
+</div>
+<p>and as shown, access the recorded values through the <tt class="docutils literal"><span class="pre">vals</span></tt> member and the turns on which they were recorded through the <tt class="docutils literal"><span class="pre">turns</span></tt> member.  This structure is used for recording all data types.</p>
+<p>Details on recording specific data types is given below.</p>
+</div>
+<div class="section" id="recording-energies-and-group-group-energies">
+<h2>Recording energies and group-group energies<a class="headerlink" href="#recording-energies-and-group-group-energies" title="Permalink to this headline">¶</a></h2>
+<p>Example</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ljcut</span> <span class="o">=</span> <span class="n">FixLJCut</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&#39;ljcut&#39;</span><span class="p">)</span>
+<span class="n">ewald</span> <span class="o">=</span> <span class="n">FixChargeEwald</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&#39;chargeEwald&#39;</span><span class="p">,</span> <span class="s">&#39;all&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">giveNextTurn</span><span class="p">(</span><span class="n">currentTurn</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">currentTurn</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">currentTurn</span><span class="o">*</span><span class="mi">2</span>
+
+<span class="c">#this will record the potential energy of all atoms every 100 turns</span>
+<span class="n">engDataSimple</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">dataManager</span><span class="o">.</span><span class="n">recordEnergy</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;scalar&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="c">#this will record per-particle energies (as denoted by the ``mode``)</span>
+<span class="c">#every turn as given by the ``giveNextTurn`` function.  It will only</span>
+<span class="c">#record contributions due to ``ljcut`` and ``ewald`` fixes.  Any fix</span>
+<span class="c">#can be given in the ``fixes`` list.</span>
+<span class="n">engDataLogSpacing</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">dataManager</span><span class="o">.</span><span class="n">recordEnergy</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;vector&#39;</span><span class="p">,</span> <span class="n">collectGenerator</span><span class="o">=</span><span class="n">giveNextTurn</span><span class="p">,</span> <span class="n">fixes</span><span class="o">=</span><span class="p">[</span><span class="n">ljcut</span><span class="p">,</span> <span class="n">ewald</span><span class="p">])</span>
+
+<span class="c">#computes LJ interactions between ``groupA`` and ``groupB``</span>
+<span class="n">engDataGroupGroup</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">dataManager</span><span class="o">.</span><span class="n">recordEnergy</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;groupA&#39;</span><span class="p">,</span> <span class="n">handleB</span><span class="o">=</span><span class="s">&#39;groupB&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;scalar&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">fixes</span><span class="o">=</span><span class="p">[</span><span class="n">ljcut</span><span class="p">])</span>
+
+<span class="n">verlet</span> <span class="o">=</span> <span class="n">IntergatorVerlet</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+<span class="n">verlet</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c">#prints list of per-particle energy lists</span>
+<span class="k">print</span> <span class="n">engDataLogSpacing</span><span class="o">.</span><span class="n">vals</span>
+</pre></div>
+</div>
+<p><strong>Arguments</strong></p>
+<p><tt class="docutils literal"><span class="pre">handle</span></tt>: Group handle for which energies will be compted.  Defaults to <tt class="docutils literal"><span class="pre">'all'</span></tt>.</p>
+<p><tt class="docutils literal"><span class="pre">mode</span></tt>: <tt class="docutils literal"><span class="pre">'scalar'</span></tt> or <tt class="docutils literal"><span class="pre">'vector'</span></tt>.  <tt class="docutils literal"><span class="pre">'scalar'</span></tt> computes the sum of relevant energies while <tt class="docutils literal"><span class="pre">'vector'</span></tt> computes per-particle energies represented as a python list.  Defaults to <tt class="docutils literal"><span class="pre">'scalar'</span></tt></p>
+<p><tt class="docutils literal"><span class="pre">interval</span></tt>: How often data is recorded.  Either <tt class="docutils literal"><span class="pre">interval</span></tt> or <tt class="docutils literal"><span class="pre">collectGenerator</span></tt> must be specified</p>
+<p><tt class="docutils literal"><span class="pre">collectGenerator</span></tt>: Function which takes the current turn on which data is being recorded and returns the next turn on which it should be recorded.  Either <tt class="docutils literal"><span class="pre">interval</span></tt> or <tt class="docutils literal"><span class="pre">collectGenerator</span></tt> must be specified</p>
+<p><tt class="docutils literal"><span class="pre">fixes</span></tt>: Fixes for which energy will be recorded.  Defaults to all active fixes</p>
+<p><tt class="docutils literal"><span class="pre">handleB</span></tt>: For group-group energies, the handle of the other group.  This is the other parameter which must be specified to perform group-group energy calculations.</p>
+</div>
+<div class="section" id="recording-temperatures-and-kinetic-energies">
+<h2>Recording temperatures and kinetic energies<a class="headerlink" href="#recording-temperatures-and-kinetic-energies" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ljcut</span> <span class="o">=</span> <span class="n">FixLJCut</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&#39;ljcut&#39;</span><span class="p">)</span>
+<span class="n">ewald</span> <span class="o">=</span> <span class="n">FixChargeEwald</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&#39;chargeEwald&#39;</span><span class="p">,</span> <span class="s">&#39;all&#39;</span><span class="p">)</span>
+
+<span class="c">#this will record the temperature of all atoms every 100 turns</span>
+<span class="n">tempDataScalar</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">dataManager</span><span class="o">.</span><span class="n">recordTemperature</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;scalar&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="c">#this will record per-particle kinetic energies (as denoted by the ``mode``)</span>
+<span class="c">#every turn as given by the ``giveNextTurn`` function.</span>
+<span class="n">tempDataVector</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">dataManager</span><span class="o">.</span><span class="n">recordEnergy</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;vector&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="n">verlet</span> <span class="o">=</span> <span class="n">IntergatorVerlet</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+<span class="n">verlet</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c">#prints list of tenoeratures followed by the turns at which those</span>
+<span class="c">#data points were recorded</span>
+<span class="k">print</span> <span class="n">tempDataScalar</span><span class="o">.</span><span class="n">vals</span><span class="p">,</span> <span class="n">tempDataScalar</span><span class="o">.</span><span class="n">turns</span>
+</pre></div>
+</div>
+<p><strong>Arguments</strong></p>
+<p><tt class="docutils literal"><span class="pre">handle</span></tt>: Group handle for which temperature will be compted.  Defaults to <tt class="docutils literal"><span class="pre">'all'</span></tt>.</p>
+<p><tt class="docutils literal"><span class="pre">mode</span></tt>: <tt class="docutils literal"><span class="pre">'scalar'</span></tt> or <tt class="docutils literal"><span class="pre">'vector'</span></tt>.  <tt class="docutils literal"><span class="pre">'scalar'</span></tt> computes the temperature of the group given by <tt class="docutils literal"><span class="pre">handle</span></tt> while  <tt class="docutils literal"><span class="pre">'vector'</span></tt> computes per-particle kinetic energies represented as a python list.  Defaults to <tt class="docutils literal"><span class="pre">'scalar'</span></tt></p>
+<p><tt class="docutils literal"><span class="pre">interval</span></tt>: How often data is recorded.  Either <tt class="docutils literal"><span class="pre">interval</span></tt> or <tt class="docutils literal"><span class="pre">collectGenerator</span></tt> must be specified</p>
+<p><tt class="docutils literal"><span class="pre">collectGenerator</span></tt>: Function which takes the current turn on which data is being recorded and returns the next turn on which it should be recorded.  Either <tt class="docutils literal"><span class="pre">interval</span></tt> or <tt class="docutils literal"><span class="pre">collectGenerator</span></tt> must be specified</p>
+</div>
+<div class="section" id="recording-pressures-and-virial-coefficients">
+<h2>Recording pressures and virial coefficients<a class="headerlink" href="#recording-pressures-and-virial-coefficients" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#this will record the system&#39;s pressure every 100 turns</span>
+<span class="n">pressureData</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">dataManager</span><span class="o">.</span><span class="n">recordPressure</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;scalar&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="c">#records pressure tensor</span>
+<span class="n">pressureDataTensor</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">dataManager</span><span class="o">.</span><span class="n">recordPressure</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;tensor&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="n">verlet</span> <span class="o">=</span> <span class="n">IntergatorVerlet</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+<span class="n">verlet</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c">#prints list of pressures</span>
+<span class="k">print</span> <span class="n">pressureData</span><span class="o">.</span><span class="n">vals</span>
+</pre></div>
+</div>
+<p><strong>Arguments</strong></p>
+<p><tt class="docutils literal"><span class="pre">handle</span></tt>: Group handle for which temperature will be compted.  Defaults to <tt class="docutils literal"><span class="pre">'all'</span></tt>.</p>
+<p><tt class="docutils literal"><span class="pre">mode</span></tt>: <tt class="docutils literal"><span class="pre">'scalar'</span></tt> or <tt class="docutils literal"><span class="pre">'tensor'</span></tt>.  <tt class="docutils literal"><span class="pre">'scalar'</span></tt> computes the pressure of the group given by <tt class="docutils literal"><span class="pre">handle</span></tt> while  <tt class="docutils literal"><span class="pre">'tensor'</span></tt> computes pressuretensor due to that group.  Defaults to <tt class="docutils literal"><span class="pre">'scalar'</span></tt></p>
+<p><tt class="docutils literal"><span class="pre">interval</span></tt>: How often data is recorded.  Either <tt class="docutils literal"><span class="pre">interval</span></tt> or <tt class="docutils literal"><span class="pre">collectGenerator</span></tt> must be specified</p>
+<p><tt class="docutils literal"><span class="pre">collectGenerator</span></tt>: Function which takes the current turn on which data is being recorded and returns the next turn on which it should be recorded.  Either <tt class="docutils literal"><span class="pre">interval</span></tt> or <tt class="docutils literal"><span class="pre">collectGenerator</span></tt> must be specified</p>
+</div>
+<div class="section" id="recording-volume-and-boundaries">
+<h2>Recording volume and boundaries<a class="headerlink" href="#recording-volume-and-boundaries" title="Permalink to this headline">¶</a></h2>
+<p>The system bounding box can also be recorded.  From this volume, side lens, rates of volume change, etc, can easily be computed.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#this will record the system&#39;s pressure every 100 turns</span>
+<span class="n">boundsData</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">dataManager</span><span class="o">.</span><span class="n">recordBounds</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="n">verlet</span> <span class="o">=</span> <span class="n">IntergatorVerlet</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+<span class="n">verlet</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c">#prints list of pressures</span>
+<span class="n">volumes</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">xSideLengths</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">bounds</span> <span class="ow">in</span> <span class="n">boundsData</span><span class="o">.</span><span class="n">vals</span><span class="p">:</span>
+    <span class="n">volumes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bounds</span><span class="o">.</span><span class="n">volume</span><span class="p">())</span>
+    <span class="n">xSideLengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bounds</span><span class="o">.</span><span class="n">hi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="o">.</span><span class="n">lo</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c">#all the volumes computed</span>
+<span class="k">print</span> <span class="n">volumes</span>
+</pre></div>
+</div>
+<p><strong>Arguments</strong></p>
+<p><tt class="docutils literal"><span class="pre">interval</span></tt>: How often data is recorded.  Either <tt class="docutils literal"><span class="pre">interval</span></tt> or <tt class="docutils literal"><span class="pre">collectGenerator</span></tt> must be specified</p>
+<p><tt class="docutils literal"><span class="pre">collectGenerator</span></tt>: Function which takes the current turn on which data is being recorded and returns the next turn on which it should be recorded.  Either <tt class="docutils literal"><span class="pre">interval</span></tt> or <tt class="docutils literal"><span class="pre">collectGenerator</span></tt> must be specified</p>
+</div>
+<div class="section" id="turning-off-recording">
+<h2>Turning off recording<a class="headerlink" href="#turning-off-recording" title="Permalink to this headline">¶</a></h2>
+<p>Recording of a data set can be stopped at any time by calling the <tt class="docutils literal"><span class="pre">stopRecord</span></tt> method of the <tt class="docutils literal"><span class="pre">DataManager</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">myDataSet</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">dataManager</span><span class="o">.</span><span class="n">recordTemperature</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;scalar&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="c">#turns off recording</span>
+<span class="n">state</span><span class="o">.</span><span class="n">dataManager</span><span class="o">.</span><span class="n">stopRecord</span><span class="p">(</span><span class="n">myDataSet</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Recording Data</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#id1">Recording data</a></li>
+<li><a class="reference internal" href="#recording-energies-and-group-group-energies">Recording energies and group-group energies</a></li>
+<li><a class="reference internal" href="#recording-temperatures-and-kinetic-energies">Recording temperatures and kinetic energies</a></li>
+<li><a class="reference internal" href="#recording-pressures-and-virial-coefficients">Recording pressures and virial coefficients</a></li>
+<li><a class="reference internal" href="#recording-volume-and-boundaries">Recording volume and boundaries</a></li>
+<li><a class="reference internal" href="#turning-off-recording">Turning off recording</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="state.html"
+                        title="previous chapter">Simulation State</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="writing-trajectories.html"
+                        title="next chapter">Writing Trajectories</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/data-recording.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="writing-trajectories.html" title="Writing Trajectories"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="state.html" title="Simulation State"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

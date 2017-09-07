@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Units &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="Python Operation" href="python-operation.html" />
+    <link rel="prev" title="Bounds" href="Bounds.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="python-operation.html" title="Python Operation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Bounds.html" title="Bounds"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="units">
+<h1>Units<a class="headerlink" href="#units" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Simulations in Dash can use either real or reduced/Lennard-Jones units.  This is specified by updating the <tt class="docutils literal"><span class="pre">units</span></tt> attribute of the <tt class="docutils literal"><span class="pre">state</span></tt>.  Lennard-Jones units are the default, so it is imporant to select the desired units before setting simulation parameters.</p>
+</div>
+<div class="section" id="setting-real-units">
+<h2>Setting Real Units<a class="headerlink" href="#setting-real-units" title="Permalink to this headline">¶</a></h2>
+<p>Dash can be set to real (or LJ) units by invoking the <tt class="docutils literal"><span class="pre">setReal()</span></tt> (or <tt class="docutils literal"><span class="pre">setLJ()</span></tt>) method of the <tt class="docutils literal"><span class="pre">units</span></tt> property in the <tt class="docutils literal"><span class="pre">state</span></tt>.  Real units are the following:</p>
+<p><cite>Energy</cite>: kcal/mol</p>
+<p><cite>Distance</cite>: Angstroms</p>
+<p><cite>Time</cite>: femptoseconds</p>
+<p><cite>Temperature</cite>: Kelvin</p>
+<p><cite>Mass</cite>: atomic mass units (amu)</p>
+<p><cite>Charge</cite>: electronic charge</p>
+<p><cite>Pressure</cite>: atmospheres</p>
+<p><strong>Example</strong></p>
+<p>The following code sets the units of a simulation to real units and then back to reduced units.</p>
+<p>Setting the units also sets the timestep to default values of 1.0 fs for real units and 0.005 for LJ units.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#set real units</span>
+<span class="n">state</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">setReal</span><span class="p">()</span>
+
+<span class="c">#return to LJ/reduced units</span>
+<span class="n">state</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">setLJ</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Units</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#setting-real-units">Setting Real Units</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Bounds.html"
+                        title="previous chapter">Bounds</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="python-operation.html"
+                        title="next chapter">Python Operation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/Units.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="python-operation.html" title="Python Operation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Bounds.html" title="Bounds"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Springs &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="Nose-Hoover Thermostat and Barostat" href="fix-NoseHoover.html" />
+    <link rel="prev" title="External Quartic Potential Fix" href="fix-external-quartic.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fix-NoseHoover.html" title="Nose-Hoover Thermostat and Barostat"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fix-external-quartic.html" title="External Quartic Potential Fix"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="springs">
+<h1>Springs<a class="headerlink" href="#springs" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Applies a harmonic potential tethering atoms to user-defined coordinates with a potential given by</p>
+<div class="math">
+\[U_{\text{spring}} = \frac{1}{2} \sum_{d=x,y,z} k(r_d - r_{d0})^2,\]</div>
+<p>where {k} is a scalar and mathbf{r}_0=(r_{x0},r_{y0},r_{z0})` is a <tt class="docutils literal"><span class="pre">Vector</span></tt> which denotes each atom&#8217;s tether position.  Anisotropic springs including one and two dimensional springs can be created by setting different coefficients for different dimensions.</p>
+<p>By default each atom is tethered to its position when the spring fix is initialized, however arbitrary positions can be set for each atom as shown in the examples.</p>
+<p>Springs differ from external potentials in that springs can tether each atom to a different position, while external potentials simulate all atoms within the relevant group in the same external field.</p>
+</div>
+<div class="section" id="constructor">
+<h2>Constructor<a class="headerlink" href="#constructor" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">FixSpringStatic</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">groupHandle</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">tetherFunc</span><span class="p">,</span> <span class="n">multiplier</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">state</span></tt></dt>
+<dd>Simulation state to apply the fix. Named argument.</dd>
+<dt><tt class="docutils literal"><span class="pre">handle</span></tt></dt>
+<dd>A name for the fix. Named argument.</dd>
+<dt><tt class="docutils literal"><span class="pre">groupHandle</span></tt></dt>
+<dd>Group of atoms to which the fix is applied.  Named argument.</dd>
+<dt><tt class="docutils literal"><span class="pre">k</span></tt></dt>
+<dd>Spring coefficient for tethers.  Floating point number.  Named argument</dd>
+<dt><tt class="docutils literal"><span class="pre">tetherFunc</span></tt></dt>
+<dd>Python function which, when passed an atom, must return a <tt class="docutils literal"><span class="pre">Vector</span></tt> which is the position to which that atom will be tethered.  Optional.  Defaults to tethering to current position.  Named argument.</dd>
+<dt><tt class="docutils literal"><span class="pre">multiplier</span></tt></dt>
+<dd>Scales <tt class="docutils literal"><span class="pre">k</span></tt> in each dimension.  Can be set to create anisotropic potentials or 2d / 1d springs.  Optional.  Defaults to <tt class="docutils literal"><span class="pre">Vector(1,</span> <span class="pre">1,</span> <span class="pre">1)</span></tt>.  Named argument.</dd>
+</dl>
+</div>
+<div class="section" id="python-member-functions">
+<h2>Python Member Functions<a class="headerlink" href="#python-member-functions" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">updateTethers</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>No arguments.  Recalculates atom tether positions based on new atom coordinates.  If no <tt class="docutils literal"><span class="pre">tetherFunc</span></tt> is supplied, tethers are set to atoms&#8217; current positions.  If a <tt class="docutils literal"><span class="pre">tetherFunc</span></tt> is supplied, <tt class="docutils literal"><span class="pre">tetherFunc</span></tt> is called for each atom in <tt class="docutils literal"><span class="pre">groupHandle</span></tt> and new positions are determined.</p>
+</div>
+<div class="section" id="python-members">
+<h2>Python Members<a class="headerlink" href="#python-members" title="Permalink to this headline">¶</a></h2>
+<p><strong>multiplier</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#makes anisotropic spring that acts with kx = k, ky = 2k, kz = 0</span>
+<span class="n">spring</span><span class="o">.</span><span class="n">multiplier</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>k</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#sets spring constant for tethers</span>
+<span class="n">spring</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="mi">10</span>
+</pre></div>
+</div>
+<p><strong>tetherFunc</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">myFunc</span><span class="p">(</span><span class="n">atom</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">round</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">round</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+<span class="c">#sets new tetherFunc for the spring</span>
+<span class="n">spring</span><span class="o">.</span><span class="n">tetherFunc</span> <span class="o">=</span> <span class="n">myFunc</span>
+
+<span class="c">#must call updateTethers to generate new tethers</span>
+<span class="n">spring</span><span class="o">.</span><span class="n">updateTethers</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#creates fix which tethers all atoms in the group &#39;substrateAtoms&#39; to their</span>
+<span class="c">#current positions with k=10</span>
+<span class="n">spring</span> <span class="o">=</span> <span class="n">FixSpringStatic</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="s">&#39;spring1&#39;</span><span class="p">,</span> <span class="n">groupHandle</span><span class="o">=</span><span class="s">&#39;substrateAtoms&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">spring</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">myTetherFunc</span><span class="p">(</span><span class="n">atom</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">atom</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">atom</span><span class="o">.</span><span class="n">pos</span>
+
+<span class="c">#create a spring which will tether only in the x dimension.  Atoms with x&gt;10 will be tethered to x=15 and all others will be tethered to their original x position.</span>
+<span class="n">spring</span> <span class="o">=</span> <span class="n">FixSpringStatic</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="s">&#39;spring2&#39;</span><span class="p">,</span> <span class="n">groupHandle</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">tetherFunc</span><span class="o">=</span><span class="n">myTetherFunc</span><span class="p">,</span> <span class="n">multiplier</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+<span class="c">#run the simulation</span>
+<span class="n">integrator</span> <span class="o">=</span> <span class="n">IntegratorVerlet</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">integrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+
+<span class="c">#change spring constant</span>
+<span class="n">spring</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="c">#now spring applies in y dimension as well</span>
+<span class="n">spring</span><span class="o">.</span><span class="n">multiplier</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c">#update atom tethers based on current atom positions.</span>
+<span class="n">spring</span><span class="o">.</span><span class="n">updateTethers</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Springs</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#constructor">Constructor</a></li>
+<li><a class="reference internal" href="#python-member-functions">Python Member Functions</a></li>
+<li><a class="reference internal" href="#python-members">Python Members</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fix-external-quartic.html"
+                        title="previous chapter">External Quartic Potential Fix</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fix-NoseHoover.html"
+                        title="next chapter">Nose-Hoover Thermostat and Barostat</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/springs.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="fix-NoseHoover.html" title="Nose-Hoover Thermostat and Barostat"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fix-external-quartic.html" title="External Quartic Potential Fix"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

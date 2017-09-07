@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Isokinetic Thermostat &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="Intergrator Verlet" href="integrator-Verlet.html" />
+    <link rel="prev" title="Andersen Thermostat" href="fix-NVT-Andersen.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="integrator-Verlet.html" title="Intergrator Verlet"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fix-NVT-Andersen.html" title="Andersen Thermostat"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="isokinetic-thermostat">
+<h1>Isokinetic Thermostat<a class="headerlink" href="#isokinetic-thermostat" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The FixNVTRescale permits rescaling of the velocities every <tt class="docutils literal"><span class="pre">applyEvery</span></tt> turn in the simulation for maintaining the temperature at some specified set point <tt class="docutils literal"><span class="pre">T</span></tt>.  Temperature set points may be specified as a constant float value, as a list of temperatures with associated time intervals, or as a python function.</p>
+</div>
+<div class="section" id="constructor">
+<h2>Constructor<a class="headerlink" href="#constructor" title="Permalink to this headline">¶</a></h2>
+<p>An isokinetic thermostat may be instantiated using any of the following constructors:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">FixNVTRescale</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="n">handle</span><span class="p">,</span><span class="n">groupHandle</span><span class="p">,</span><span class="n">temp</span><span class="p">,</span><span class="n">applyEvery</span><span class="p">)</span>
+<span class="n">FixNVTRescale</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="n">handle</span><span class="p">,</span><span class="n">groupHandle</span><span class="p">,</span><span class="n">tempFunc</span><span class="p">,</span><span class="n">applyEvery</span><span class="p">)</span>
+<span class="n">FixNVTRescale</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="n">handle</span><span class="p">,</span><span class="n">groupHandle</span><span class="p">,</span><span class="n">intervals</span><span class="p">,</span><span class="n">temps</span><span class="p">,</span><span class="n">applyEvery</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">state</span></tt></dt>
+<dd>The simulation State to which this fix is applied.</dd>
+<dt><tt class="docutils literal"><span class="pre">handle</span></tt></dt>
+<dd>The name for this fix.  String type.</dd>
+<dt><tt class="docutils literal"><span class="pre">groupHandle</span></tt></dt>
+<dd>The group of atoms to which this fix is applied.  String type.</dd>
+<dt><tt class="docutils literal"><span class="pre">temp</span></tt></dt>
+<dd>The temperature to which the kinetic energy will be rescaled.  Float type.</dd>
+<dt><tt class="docutils literal"><span class="pre">applyEvery</span></tt></dt>
+<dd>The number of turns to elapse between applications of this fix.  Integer type.</dd>
+<dt><tt class="docutils literal"><span class="pre">tempFunc</span></tt></dt>
+<dd>The function specifying the set point temperatures throughout the simulation to which the kinetic energy will be rescaled.  Python function.</dd>
+<dt><tt class="docutils literal"><span class="pre">intervals</span></tt></dt>
+<dd>A list of fractions through the current run for the corresponding list of temperature set points.  List of floats.</dd>
+<dt><tt class="docutils literal"><span class="pre">temps</span></tt></dt>
+<dd>A list of temperature set points to be used throughout the simulation.  List of floats.</dd>
+</dl>
+</div>
+<div class="section" id="python-member-functions">
+<h2>Python Member Functions<a class="headerlink" href="#python-member-functions" title="Permalink to this headline">¶</a></h2>
+<p>This Fix contains no python member functions.</p>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># create a simulation state to which we will apply the fix</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">State</span><span class="p">()</span>
+
+<span class="c"># make an instance of the fix; T = 250.0 K, applyEvery = 7</span>
+<span class="n">fixNVT</span> <span class="o">=</span> <span class="n">fixNVTRescale</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="s">&quot;nvt&quot;</span><span class="p">,</span><span class="s">&quot;all&quot;</span><span class="p">,</span><span class="mf">250.0</span><span class="p">,</span><span class="mi">7</span><span class="p">)</span>
+
+<span class="c"># activate the fix</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">fixNVT</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Isokinetic Thermostat</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#constructor">Constructor</a></li>
+<li><a class="reference internal" href="#python-member-functions">Python Member Functions</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fix-NVT-Andersen.html"
+                        title="previous chapter">Andersen Thermostat</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="integrator-Verlet.html"
+                        title="next chapter">Intergrator Verlet</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/fix-NVT-rescale.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="integrator-Verlet.html" title="Intergrator Verlet"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fix-NVT-Andersen.html" title="Andersen Thermostat"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

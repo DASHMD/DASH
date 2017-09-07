@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Compiling DASH &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="Getting Starting" href="getting-started.html" />
+    <link rel="prev" title="Welcome to DASH’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="getting-started.html" title="Getting Starting"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to DASH’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="compiling-dash">
+<h1>Compiling DASH<a class="headerlink" href="#compiling-dash" title="Permalink to this headline">¶</a></h1>
+<p>DASH uses CMake to compile and requires a CUDA-capable GPU to run.  Currently DASH is set up for for Linux systems.</p>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>CUDA 8.0 and GCC 4.7 - 5.4.x <em>or</em> CUDA 7.5 and GCC 4.7 - 4.9.x</li>
+<li>Boost with Python libraries</li>
+<li>CMake</li>
+<li>Python 2.7</li>
+</ul>
+</div>
+<div class="section" id="compiling">
+<h2>Compiling<a class="headerlink" href="#compiling" title="Permalink to this headline">¶</a></h2>
+<p>DASH can be compiled with the following commands</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c">#check out source code</span>
+git checkout http://github.com/MICCoM/DASH-public .
+
+mkdir build
+
+<span class="nb">cd </span>build
+
+<span class="c">#Sets up Makefile.  If CMake cannot find any of the required</span>
+<span class="c">#libraries, you may have to manually specifiy their paths.</span>
+<span class="c">#See CMake documentation for help.</span>
+cmake ..
+
+make
+<span class="c">#or for faster compiling, make -j 4 to compile with 4 processors</span>
+</pre></div>
+</div>
+<p>This produces two files that you need: libDASH.so and DASH.so .
+libDASH.so is the compiled simulation engine library.  The path to libDASH.so must be in your LD_LIBRARY_PATH environment variable to run DASH.  The second file, DASH.so, is the Python wrapper.  The path to DASH.so must be in your Python <tt class="docutils literal"><span class="pre">sys.path</span></tt> variable.  This is what lets Python find DASH when you write <tt class="docutils literal"><span class="pre">import</span> <span class="pre">DASH</span></tt>.  Note that CMake will put DASH.so in different folders depending on your system configuration.  Find it using <tt class="docutils literal"><span class="pre">find</span> <span class="pre">.</span> <span class="pre">-name</span> <span class="pre">&quot;DASH.so</span></tt>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Compiling DASH</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#compiling">Compiling</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to DASH&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="getting-started.html"
+                        title="next chapter">Getting Starting</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/compiling.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="getting-started.html" title="Getting Starting"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to DASH’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

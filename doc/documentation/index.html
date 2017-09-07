@@ -1,0 +1,386 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to DASH’s documentation! &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="#" />
+    <link rel="next" title="Compiling DASH" href="compiling.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="compiling.html" title="Compiling DASH"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="welcome-to-dash-s-documentation">
+<h1>Welcome to DASH&#8217;s documentation!<a class="headerlink" href="#welcome-to-dash-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>DASH is a GPU-accelerated molecular dynamics software package designed for both atomistic and coarse grained simulations.  DASH is controlled via a powerful python interface, which gives the user full control to set up, modify, and analyze simulations all within one script.  Using efficient parallel algorithms, DASH also provides the facility to compute arbitrarly complex user-defined types of data while maintaining high performance.</p>
+<p>DASH is specifically optimized for running with the the advanced sampling package SSAGES, allowing up to double the performance of leading competitors.  With plain molecule dynamics, performance in DASH is comparable to the fastest codes available.</p>
+<p>DASH supports several water models including TIP3P, TIP4P (and variants), as well as the E3B model, a fast and robust 3-body water model parameterized to capture much of the water phase diagram (Kumar, JPC, 2008).</p>
+<p>In addition to these features, DASH provides all the standard functionality users have come to expect from a batteries-included molecules dynamics package, including a variety of thermostats, barostats, elegant methods for dealing with molecules, long range charge computation, multiple force fields, and much more.</p>
+<p>Getting started</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="compiling.html">Compiling DASH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Starting</a></li>
+</ul>
+</div>
+<p>Core functionality</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="state.html">Simulation State</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="state.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="state.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="state.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="state.html#python-members">Python members</a></li>
+<li class="toctree-l2"><a class="reference internal" href="state.html#groups-and-molecules">Groups and Molecules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="state.html#managing-fixes-configuration-writers-and-python-operations">Managing fixes, configuration writers, and python operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="state.html#selecting-gpus">Selecting GPUs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data-recording.html">Recording Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="data-recording.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-recording.html#id1">Recording data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-recording.html#recording-energies-and-group-group-energies">Recording energies and group-group energies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-recording.html#recording-temperatures-and-kinetic-energies">Recording temperatures and kinetic energies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-recording.html#recording-pressures-and-virial-coefficients">Recording pressures and virial coefficients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-recording.html#recording-volume-and-boundaries">Recording volume and boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-recording.html#turning-off-recording">Turning off recording</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="writing-trajectories.html">Writing Trajectories</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="writing-trajectories.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing-trajectories.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing-trajectories.html#constructor">Constructor</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reading-trajectories.html">Reading trajectories</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reading-trajectories.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Atoms.html">Atoms</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Atoms.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Atoms.html#adding-atoms-to-the-simulation">Adding atoms to the simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Atoms.html#accessing-and-updating-atom-data">Accessing and updating atom data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Atoms.html#setting-atom-parameters">Setting atom parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Atoms.html#tools-for-initializing-atoms">Tools for initializing atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Atoms.html#water-molecules">Water molecules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Atoms.html#deleting-atoms">Deleting atoms</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Bounds.html">Bounds</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Bounds.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Bounds.html#creating-and-modifying-bounds">Creating and Modifying Bounds</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Units.html">Units</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Units.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Units.html#setting-real-units">Setting Real Units</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="python-operation.html">Python Operation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="python-operation.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-operation.html#basic-usage">Basic Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="molecule.html">Molecules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="molecule.html#overview">Overview</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>Potentials</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="fix-bond-harmonic.html">Harmonic Bond Style</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-bond-harmonic.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-bond-harmonic.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-bond-harmonic.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-bond-harmonic.html#lammps-data-file-parameter-order">LAMMPS data file parameter order</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fix-bond-fene.html">FENE Bond Style</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-bond-fene.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-bond-fene.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-bond-fene.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-bond-fene.html#lammps-data-file-parameter-order">LAMMPS data file parameter order</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fix-angle-harmonic.html">Harmonic Angle Style</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-angle-harmonic.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-angle-harmonic.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-angle-harmonic.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-angle-harmonic.html#lammps-data-file-parameter-order">LAMMPS data file parameter order</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fix-angle-charmm.html">CHARMM Angle Style</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-angle-charmm.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-angle-charmm.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-angle-charmm.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-angle-charmm.html#lammps-data-file-parameter-order">LAMMPS data file parameter order</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fix-angle-cosinedelta.html">Cosine Angle Style</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-angle-cosinedelta.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-angle-cosinedelta.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-angle-cosinedelta.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-angle-cosinedelta.html#lammps-data-file-parameter-order">LAMMPS data file parameter order</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fix-dihedral-opls.html">OPLS/Cosine Series Dihedral Style</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-dihedral-opls.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-dihedral-opls.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-dihedral-opls.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-dihedral-opls.html#lammps-data-file-parameter-order">LAMMPS data file parameter order</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fix-dihedral-charmm.html">CHARMM/Cosine Dihedral Style</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-dihedral-charmm.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-dihedral-charmm.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-dihedral-charmm.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-dihedral-charmm.html#lammps-data-file-parameter-order">LAMMPS data file parameter order</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fix-pair-LJ.html">LJ Pair potential</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-pair-LJ.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-pair-LJ.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-pair-LJ.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-pair-LJ.html#lammps-data-file-parameter-order">LAMMPS data file parameter order</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fix-pair-LJFS.html">Force shifted LJ Pair potential</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-pair-LJFS.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-pair-LJFS.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-pair-LJFS.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-pair-LJFS.html#lammps-data-file-parameter-order">LAMMPS data file parameter order</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fix-pair-TICG.html">TICG pair potential</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-pair-TICG.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-pair-TICG.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-pair-TICG.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-pair-TICG.html#lammps-data-file-parameter-order">LAMMPS data file parameter order</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fix-charge-DSF.html">DSF Charge Pair potential</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-charge-DSF.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-charge-DSF.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-charge-DSF.html#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fix-charge-Ewald.html">Ewald potential with long-range Coulomb interactions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-charge-Ewald.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-charge-Ewald.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-charge-Ewald.html#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fix-wall-LJ126.html">LJ Wall Potential</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-wall-LJ126.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-wall-LJ126.html#constructor">Constructor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-wall-LJ126.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-wall-LJ126.html#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fix-wall-harmonic.html">Harmonic Wall Potential</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-wall-harmonic.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-wall-harmonic.html#constructor">Constructor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-wall-harmonic.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-wall-harmonic.html#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>External potentials:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="fix-external-harmonic.html">External Harmonic Potential Fix</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-external-harmonic.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-external-harmonic.html#constructor">Constructor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-external-harmonic.html#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fix-external-quartic.html">External Quartic Potential Fix</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-external-quartic.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-external-quartic.html#constructor">Constructor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-external-quartic.html#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="springs.html">Springs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="springs.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="springs.html#constructor">Constructor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="springs.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="springs.html#python-members">Python Members</a></li>
+<li class="toctree-l2"><a class="reference internal" href="springs.html#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>Thermostats and Barostats:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="fix-NoseHoover.html">Nose-Hoover Thermostat and Barostat</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-NoseHoover.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-NoseHoover.html#constructor">Constructor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-NoseHoover.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-NoseHoover.html#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fix-pressure-Berendsen.html">Berendsen Barostat</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-pressure-Berendsen.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-pressure-Berendsen.html#constructor">Constructor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-pressure-Berendsen.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-pressure-Berendsen.html#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fix-Langevin.html">Fix Langevin</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-Langevin.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-Langevin.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-Langevin.html#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fix-NVT-Andersen.html">Andersen Thermostat</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-NVT-Andersen.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-NVT-Andersen.html#constructors">Constructors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-NVT-Andersen.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-NVT-Andersen.html#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fix-NVT-rescale.html">Isokinetic Thermostat</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fix-NVT-rescale.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-NVT-rescale.html#constructor">Constructor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-NVT-rescale.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fix-NVT-rescale.html#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>Integrators:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="integrator-Verlet.html">Intergrator Verlet</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="integrator-Verlet.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integrator-Verlet.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integrator-Verlet.html#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="integrator-relax.html">Intergrator FIRE relaxation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="integrator-relax.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integrator-relax.html#python-member-functions">Python Member Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integrator-relax.html#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>Utilities and external functionality</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="lammps-reader.html">LAMMPS reader</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lammps-reader.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lammps-reader.html#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ssages.html">Coupling with SSAGES</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ssages.html#example">Example</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to DASH&#8217;s documentation!</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="compiling.html"
+                        title="next chapter">Compiling DASH</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="compiling.html" title="Compiling DASH"
+             >next</a> |</li>
+        <li><a href="#">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

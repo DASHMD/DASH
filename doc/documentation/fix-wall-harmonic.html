@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Harmonic Wall Potential &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="External Harmonic Potential Fix" href="fix-external-harmonic.html" />
+    <link rel="prev" title="LJ Wall Potential" href="fix-wall-LJ126.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fix-external-harmonic.html" title="External Harmonic Potential Fix"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fix-wall-LJ126.html" title="LJ Wall Potential"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="harmonic-wall-potential">
+<h1>Harmonic Wall Potential<a class="headerlink" href="#harmonic-wall-potential" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Implements a harmonic potential energy wall at a specified origin <tt class="docutils literal"><span class="pre">origin</span></tt> with force in the vector direction <tt class="docutils literal"><span class="pre">forceDir</span></tt>.  The cut off distance is specified by the <tt class="docutils literal"><span class="pre">dist</span></tt> keyword.  The spring constant associated with the wall is denoted by the <tt class="docutils literal"><span class="pre">k</span></tt> parameter.  The wall potential has a potential energy function given by</p>
+<div class="math">
+\[U_{\text{wall}} = \frac{1}{2} k (r - r_{0})^2\]</div>
+</div>
+<div class="section" id="constructor">
+<h2>Constructor<a class="headerlink" href="#constructor" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">FixWallHarmonic</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="n">handle</span><span class="p">,</span><span class="n">groupHandle</span><span class="p">,</span><span class="n">origin</span><span class="p">,</span><span class="n">forceDir</span><span class="p">,</span><span class="n">dist</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">state</span></tt></dt>
+<dd>Simulation state to apply the fix.</dd>
+<dt><tt class="docutils literal"><span class="pre">handle</span></tt></dt>
+<dd>A name for the object.  String type.</dd>
+<dt><tt class="docutils literal"><span class="pre">groupHandle</span></tt></dt>
+<dd>Group of atoms to which the fix is applied.  String type.</dd>
+<dt><tt class="docutils literal"><span class="pre">origin</span></tt></dt>
+<dd>Point of origin for the wall.  Vector type.</dd>
+<dt><tt class="docutils literal"><span class="pre">forceDir</span></tt></dt>
+<dd>The direction in which the force is to be applied.  Vector type.</dd>
+<dt><tt class="docutils literal"><span class="pre">dist</span></tt></dt>
+<dd>The cutoff for the potential.  Float type.</dd>
+<dt><tt class="docutils literal"><span class="pre">k</span></tt></dt>
+<dd>The spring constant associated with the wall.  Float type.</dd>
+</dl>
+</div>
+<div class="section" id="python-member-functions">
+<h2>Python Member Functions<a class="headerlink" href="#python-member-functions" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>Member data of the FixWallHarmonicpotential may be modified directly via the Python interface; namely, &#8216;k&#8217;, &#8216;dist&#8217;, &#8216;forceDir&#8217;, and &#8216;origin&#8217; keywords are directly accessible from an instance of FixWallHarmonic.</p>
+<p>To modify any these parameters, simply assign them a new value of an appropriate type.</p>
+</div></blockquote>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Example 1: Creating an instance of FixWallHarmonic</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># create a simulation state to which we will add the fix</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">state</span><span class="p">()</span>
+
+<span class="c"># set the bounds of the state</span>
+<span class="n">state</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">Bounds</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">lo</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">hi</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">30</span><span class="p">))</span>
+
+<span class="c"># put the wall at (0,0,0)</span>
+<span class="n">origin</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c"># have the wall be acting in the +x direction</span>
+<span class="n">forceDir</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c"># cutoff distance of 15 units</span>
+<span class="n">dist</span> <span class="o">=</span> <span class="mi">15</span>
+
+<span class="c"># set a spring constant k = 2.5</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mf">2.5</span>
+
+<span class="c"># create an instance of the fix</span>
+<span class="n">fixWall</span> <span class="o">=</span> <span class="n">FixWallHarmonic</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="s">&quot;wall&quot;</span><span class="p">,</span><span class="s">&quot;all&quot;</span><span class="p">,</span><span class="n">origin</span><span class="p">,</span><span class="n">forceDir</span><span class="p">,</span><span class="n">dist</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+
+<span class="c"># activate the fix</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">fixWall</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Example 2: Modifying the force constant after instantiation</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># increase the spring constant to k = 3.5</span>
+<span class="n">fixWall</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="mf">3.5</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Harmonic Wall Potential</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#constructor">Constructor</a></li>
+<li><a class="reference internal" href="#python-member-functions">Python Member Functions</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fix-wall-LJ126.html"
+                        title="previous chapter">LJ Wall Potential</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fix-external-harmonic.html"
+                        title="next chapter">External Harmonic Potential Fix</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/fix-wall-harmonic.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="fix-external-harmonic.html" title="External Harmonic Potential Fix"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fix-wall-LJ126.html" title="LJ Wall Potential"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

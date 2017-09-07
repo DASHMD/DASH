@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Reading trajectories &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="Atoms" href="Atoms.html" />
+    <link rel="prev" title="Writing Trajectories" href="writing-trajectories.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Atoms.html" title="Atoms"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="writing-trajectories.html" title="Writing Trajectories"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="reading-trajectories">
+<h1>Reading trajectories<a class="headerlink" href="#reading-trajectories" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Trajectories in xml format can be read in as follows:</p>
+<p>First load the file.  Every <tt class="docutils literal"><span class="pre">State</span></tt> object has a <tt class="docutils literal"><span class="pre">readConfig</span></tt> member.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">state</span><span class="o">.</span><span class="n">readConfig</span><span class="o">.</span><span class="n">loadFile</span><span class="p">(</span><span class="s">&#39;myRestart.xml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A file can store one or many configurations.  To iterate to the first configuration</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">state</span><span class="o">.</span><span class="n">readConfig</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Or to iterate to the last configuration</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">state</span><span class="o">.</span><span class="n">readConfig</span><span class="o">.</span><span class="n">prev</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>To move by a certain number of trajectories</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#advance by 3 snapshots within this xml file</span>
+<span class="n">state</span><span class="o">.</span><span class="n">readConfig</span><span class="o">.</span><span class="n">moveBy</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c">#move backwards by 3 snapshots within this xml file</span>
+<span class="n">state</span><span class="o">.</span><span class="n">readConfig</span><span class="o">.</span><span class="n">moveBy</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Calling these commands again will iterate forwards or backwards over the set of trajectories.  <tt class="docutils literal"><span class="pre">next</span></tt> and <tt class="docutils literal"><span class="pre">prev</span></tt> methods will return <tt class="docutils literal"><span class="pre">True</span></tt> if a valid configuration has been read or <tt class="docutils literal"><span class="pre">False</span></tt> if you are at the end of the series of trajectories.</p>
+<p>It is important that you initialize fixes <strong>after</strong> the configuration has been read such that bonds, angles, etc, are property read in.  This restriction will be removed in future releases.</p>
+<p><strong>Other ways to read trajectories</strong></p>
+<p>One can also read in LAMMPS trajectories using the <a class="reference internal" href="lammps-reader.html"><em>LAMMPS reader</em></a>, or manually assign atom configurations using the python interface.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Reading trajectories</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="writing-trajectories.html"
+                        title="previous chapter">Writing Trajectories</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Atoms.html"
+                        title="next chapter">Atoms</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/reading-trajectories.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Atoms.html" title="Atoms"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="writing-trajectories.html" title="Writing Trajectories"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

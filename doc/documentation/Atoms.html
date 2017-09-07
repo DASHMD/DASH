@@ -1,0 +1,345 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Atoms &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="Bounds" href="Bounds.html" />
+    <link rel="prev" title="Reading trajectories" href="reading-trajectories.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Bounds.html" title="Bounds"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="reading-trajectories.html" title="Reading trajectories"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="atoms">
+<h1>Atoms<a class="headerlink" href="#atoms" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Whether you are performing atomisitic or coarse-grained simulations, the <tt class="docutils literal"><span class="pre">Atom</span></tt> class represents the particles that are interacting with each other in the system.  The <tt class="docutils literal"><span class="pre">state.atoms</span></tt> attribute is a list of <tt class="docutils literal"><span class="pre">Atom</span></tt> objects, which can be directly accessed.  Each <tt class="docutils literal"><span class="pre">Atom</span></tt> stores the dynamic data for that particle - position, velocity, and force - which are updated over the course of the simulation.  It also stores the static properties of the particle - mass, charge, atom type, and id - which do not change during the simulation.</p>
+</div>
+<div class="section" id="adding-atoms-to-the-simulation">
+<h2>Adding atoms to the simulation<a class="headerlink" href="#adding-atoms-to-the-simulation" title="Permalink to this headline">¶</a></h2>
+<p>Atoms can be introduced into the simulation by adding them directly to the <tt class="docutils literal"><span class="pre">state</span></tt> or by using the <tt class="docutils literal"><span class="pre">InitializeAtoms</span></tt> tools.  The first method is described below and the second is discussed in the next section.</p>
+<p><strong>state.addAtom(</strong> handle, pos, q <strong>)</strong></p>
+<p>Adds an atom to the <tt class="docutils literal"><span class="pre">state</span></tt>.  The atom is only added if a valid atom handle is supplied.</p>
+<p><strong>Arguments</strong></p>
+<p><tt class="docutils literal"><span class="pre">handle</span></tt>: The string representation of the corresponding atom type in the <tt class="docutils literal"><span class="pre">AtomParams</span></tt> object.</p>
+<p><tt class="docutils literal"><span class="pre">pos</span></tt>: A Vector specifying the position of the new atom.</p>
+<p><tt class="docutils literal"><span class="pre">q</span></tt>: The charge for this atom (optional).</p>
+<p><strong>Returns</strong></p>
+<p><tt class="docutils literal"><span class="pre">id</span></tt>: The id of the newly added atom. Returns <tt class="docutils literal"><span class="pre">-1</span></tt> if the atom could not be added (invalid atom type).</p>
+<p><strong>Example</strong></p>
+<p>The following code demonstrates inserting three charged atoms into the simulation</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Suppose our AtomParams object has atom types &#39;spc1&#39; and &#39;spc2&#39;</span>
+
+<span class="c">#create new positions for the atoms</span>
+
+<span class="c">#add in the atoms</span>
+<span class="n">state</span><span class="o">.</span><span class="n">addAtom</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;spc1&#39;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">q</span><span class="o">=-</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">state</span><span class="o">.</span><span class="n">addAtom</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;spc2&#39;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">q</span><span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span>
+<span class="n">state</span><span class="o">.</span><span class="n">addAtom</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;spc2&#39;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">q</span><span class="o">=-</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="accessing-and-updating-atom-data">
+<h2>Accessing and updating atom data<a class="headerlink" href="#accessing-and-updating-atom-data" title="Permalink to this headline">¶</a></h2>
+<p><strong>Class</strong> Atom</p>
+<p><strong>Attributes</strong></p>
+<p>The following atributes can be accessed for any given <tt class="docutils literal"><span class="pre">Atom</span></tt> object:</p>
+<p><tt class="docutils literal"><span class="pre">pos</span></tt>: Vector containing the particle&#8217;s position (read/write).</p>
+<p><tt class="docutils literal"><span class="pre">vel</span></tt>: Vector containing the particle&#8217;s veloctiy (read/write).</p>
+<p><tt class="docutils literal"><span class="pre">force</span></tt>: Vector containing the sum of all forces acting on the particle (read/write).</p>
+<p><tt class="docutils literal"><span class="pre">groupTag</span></tt>: A list of ids corresponding the atom groups this particle is associated with (read/write).</p>
+<p><tt class="docutils literal"><span class="pre">mass</span></tt>: The mass of the particle (read/write).</p>
+<p><tt class="docutils literal"><span class="pre">q</span></tt>: The charge of the atom (read/write).</p>
+<p><tt class="docutils literal"><span class="pre">type</span></tt>: The id of the corresponding atom type in the <tt class="docutils literal"><span class="pre">AtomParams</span></tt> object (read-only).  This is set on atom initialization (discussed elsewhere).</p>
+<p><tt class="docutils literal"><span class="pre">kinetic</span></tt>: The kinetic energy of this particle, calculated accoridng to the classical formula K = (m*v^2)/2 (read-only).</p>
+<p><tt class="docutils literal"><span class="pre">isChanged</span></tt>: A boolean flag which is set to <tt class="docutils literal"><span class="pre">True</span></tt> when an integrator updates the position, velocity, or force on the particle (read/write).</p>
+<p><strong>Example</strong></p>
+<p>The following example illustrates the syntax used to access and update atom data. In the course of initializing a simulation, it is common to programmatically assign starting positions, masses, and charges. For instance, to initialize a water molecule, one could write</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Suppose our state contains three atoms</span>
+
+<span class="c">#create new positions for the atoms</span>
+<span class="n">pos1</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">pos2</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">pos3</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">9</span><span class="p">)</span>
+
+<span class="c">#update the atom positions</span>
+<span class="n">state</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="n">pos1</span>
+<span class="n">state</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="n">pos2</span>
+<span class="n">state</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="n">pos3</span>
+
+<span class="c">#update the atom charges</span>
+<span class="n">state</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="n">state</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">state</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="mf">0.5</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="setting-atom-parameters">
+<h2>Setting atom parameters<a class="headerlink" href="#setting-atom-parameters" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">AtomParams</span></tt> object contains a directory of the atom handles/types found in the simulation along with masses and atomic numbers; handles are text identifiers for atom types (see example below).  In order to add an atom, an atom type is needed, which must also be specified in <tt class="docutils literal"><span class="pre">AromParams</span></tt>.  Fixes to set interaction parameters between various atom types interface with <tt class="docutils literal"><span class="pre">AtomParams</span></tt>.</p>
+<div class="section" id="class-atomparams">
+<h3>Class AtomParams<a class="headerlink" href="#class-atomparams" title="Permalink to this headline">¶</a></h3>
+<p><strong>Attributes</strong></p>
+<p>The following attributes and methods of the <tt class="docutils literal"><span class="pre">AtomParams</span></tt> object are available:</p>
+<p><tt class="docutils literal"><span class="pre">handles</span></tt>: A list of all the atom species handles (text names) in the simulation (read-only).</p>
+<p><tt class="docutils literal"><span class="pre">numTypes</span></tt>: The number of atom types in the simulation (read-only).</p>
+<p><tt class="docutils literal"><span class="pre">masses</span></tt>: A list of the atom species masses in the simulation (read/write).</p>
+</div>
+<div class="section" id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
+<p><strong>atomParams.addSpecies(</strong> handle, mass, atomicNum <strong>)</strong></p>
+<p><cite>Arguments</cite>:</p>
+<p><tt class="docutils literal"><span class="pre">handle</span></tt>: The handle for the new species.</p>
+<p><tt class="docutils literal"><span class="pre">mass</span></tt>: The mass for this species.</p>
+<p><tt class="docutils literal"><span class="pre">atomicNum</span></tt>: The atomic number for the species (optional).</p>
+<p><cite>Returns</cite>:</p>
+<p><tt class="docutils literal"><span class="pre">id</span></tt>: The atom type id (integer) for the newly added species.</p>
+<p><strong>atomParams.typeFromHandle(</strong> handle <strong>)</strong></p>
+<p><cite>Arguments</cite>:</p>
+<p><tt class="docutils literal"><span class="pre">handle</span></tt>: The handle (text) of a given species.</p>
+<p><cite>Returns</cite>:</p>
+<p><tt class="docutils literal"><span class="pre">id</span></tt>: The atom type id (integer) corresponding to the <tt class="docutils literal"><span class="pre">handle</span></tt>.</p>
+<p><strong>atomParams.setValues(</strong> handle, mass, atomicNum <strong>)</strong></p>
+<p>Updates the mass and/or atomic number of a given species.</p>
+<p><cite>Arguments</cite>:</p>
+<p><tt class="docutils literal"><span class="pre">handle</span></tt>: The handle for the species to be updated.</p>
+<p><tt class="docutils literal"><span class="pre">mass</span></tt>: The new mass for the species (optional).</p>
+<p><tt class="docutils literal"><span class="pre">atomicNum</span></tt>: The new atomic number for the species (optional).</p>
+<p><cite>Returns</cite>:</p>
+<p>None.</p>
+<p><strong>Example</strong></p>
+<p>The following example illustrates the syntax used to set atom parameters and update them.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Set up the parameters for a carbon atom</span>
+<span class="n">state</span><span class="o">.</span><span class="n">atomParams</span><span class="o">.</span><span class="n">addSpecies</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;myC&#39;</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+
+<span class="c">#update the mass and atomic number</span>
+<span class="n">state</span><span class="o">.</span><span class="n">atomParams</span><span class="o">.</span><span class="n">setValues</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;myC&#39;</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="mf">12.0107</span><span class="p">,</span> <span class="n">atomicNum</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="tools-for-initializing-atoms">
+<h2>Tools for initializing atoms<a class="headerlink" href="#tools-for-initializing-atoms" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">InitializeAtoms</span></tt> class provides a number of tools for initializing atom positions and velocities.</p>
+<div class="section" id="randomly-populate-the-simulation-box">
+<h3>Randomly populate the simulation box<a class="headerlink" href="#randomly-populate-the-simulation-box" title="Permalink to this headline">¶</a></h3>
+<p><strong>InitializeAtoms.populateRand(</strong> state, bounds, handle, n, distMin <strong>)</strong></p>
+<p>Randomly adds <cite>n</cite> atoms to the simulation box within the given bounds, subject to a minimum allowable distance between atoms.</p>
+<p><strong>Arguments</strong></p>
+<p><tt class="docutils literal"><span class="pre">state</span></tt>: The state to add atoms to.</p>
+<p><tt class="docutils literal"><span class="pre">bounds</span></tt>: The bounds within which to add the atoms.</p>
+<p><tt class="docutils literal"><span class="pre">handle</span></tt>: The string representation of the atom type to be added.</p>
+<p><tt class="docutils literal"><span class="pre">n</span></tt>: The number of atoms to add.</p>
+<p><tt class="docutils literal"><span class="pre">distMin</span></tt>: The minimum allowable distance between atoms.</p>
+<p><strong>Returns</strong></p>
+<p>None.</p>
+<p><strong>Example</strong></p>
+<p>The following code demonstrates the addition of some Lennard-Jones particles using this method.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Set up the parameters for a basic LJ particle</span>
+<span class="n">state</span><span class="o">.</span><span class="n">atomParams</span><span class="o">.</span><span class="n">addSpecies</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;myLJ&#39;</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ljcut</span> <span class="o">=</span> <span class="n">FixLJCut</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="s">&#39;ljcut&#39;</span><span class="p">)</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">ljcut</span><span class="p">)</span>
+<span class="n">ljcut</span><span class="o">.</span><span class="n">setParameter</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="s">&#39;eps&#39;</span><span class="p">,</span> <span class="n">handleA</span><span class="o">=</span><span class="s">&#39;myLJ&#39;</span><span class="p">,</span> <span class="n">handleB</span><span class="o">=</span><span class="s">&#39;myLJ&#39;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ljcut</span><span class="o">.</span><span class="n">setParameter</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="s">&#39;sig&#39;</span><span class="p">,</span> <span class="n">handleA</span><span class="o">=</span><span class="s">&#39;myLJ&#39;</span><span class="p">,</span> <span class="n">handleB</span><span class="o">=</span><span class="s">&#39;myLJ&#39;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c">#set the bounds for a 5x5x5 box</span>
+<span class="n">state</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">Bounds</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">lo</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">hi</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c">#Randomly add a bunch of atoms, this gives a reduced density of about 0.5</span>
+<span class="n">InitializeAtoms</span><span class="o">.</span><span class="n">populateRand</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="s">&#39;myLJ&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">distMin</span> <span class="o">=</span> <span class="mf">0.75</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="initialize-atom-velocities">
+<h3>Initialize atom velocities<a class="headerlink" href="#initialize-atom-velocities" title="Permalink to this headline">¶</a></h3>
+<p><strong>InitializeAtoms.initTemp(</strong> state, handle, temp <strong>)</strong></p>
+<p>Initializes the atoms in a given group to the desired temperature with center-of-mass motion removed.</p>
+<p><strong>Arguments</strong></p>
+<p><tt class="docutils literal"><span class="pre">state</span></tt>: The simulation state.</p>
+<p><tt class="docutils literal"><span class="pre">bounds</span></tt>: The bounds of the volume in space to be populated.</p>
+<p><tt class="docutils literal"><span class="pre">handle</span></tt>: The group name to be set to the desired temperature.</p>
+<p><tt class="docutils literal"><span class="pre">temp</span></tt>: The desired temperature.</p>
+<p><strong>Returns</strong></p>
+<p>None.</p>
+<p><strong>Example</strong></p>
+<p>The following code demonstrates the i of some Lennard-Jones particles using this method.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Set up the parameters for a basic LJ particle</span>
+<span class="n">state</span><span class="o">.</span><span class="n">atomParams</span><span class="o">.</span><span class="n">addSpecies</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;myLJ&#39;</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ljcut</span> <span class="o">=</span> <span class="n">FixLJCut</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="s">&#39;ljcut&#39;</span><span class="p">)</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">ljcut</span><span class="p">)</span>
+<span class="n">ljcut</span><span class="o">.</span><span class="n">setParameter</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="s">&#39;eps&#39;</span><span class="p">,</span> <span class="n">handleA</span><span class="o">=</span><span class="s">&#39;myLJ&#39;</span><span class="p">,</span> <span class="n">handleB</span><span class="o">=</span><span class="s">&#39;myLJ&#39;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ljcut</span><span class="o">.</span><span class="n">setParameter</span><span class="p">(</span><span class="n">param</span><span class="o">=</span><span class="s">&#39;sig&#39;</span><span class="p">,</span> <span class="n">handleA</span><span class="o">=</span><span class="s">&#39;myLJ&#39;</span><span class="p">,</span> <span class="n">handleB</span><span class="o">=</span><span class="s">&#39;myLJ&#39;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c">#set the bounds for a 5x5x5 box</span>
+<span class="n">state</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">Bounds</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">lo</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">hi</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c">#Randomly add a bunch of atoms, this gives a reduced density of about 0.5</span>
+<span class="n">InitializeAtoms</span><span class="o">.</span><span class="n">populateRand</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="s">&#39;myLJ&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">distMin</span> <span class="o">=</span> <span class="mf">0.75</span><span class="p">)</span>
+
+<span class="c">#Initialize the velocities to a reduced temperature of 0.5</span>
+<span class="n">InitializeAtoms</span><span class="o">.</span><span class="n">initTemp</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&#39;all&#39;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="water-molecules">
+<h2>Water molecules<a class="headerlink" href="#water-molecules" title="Permalink to this headline">¶</a></h2>
+<p>DASH includes utilities for creating water molecules based on TIP3P, TIP4P, and TIP4P/2005 models as well as TIP3P and TIP4P for long range electrostatics solvers.  These functions are included it <tt class="docutils literal"><span class="pre">water.py</span></tt> within the <tt class="docutils literal"><span class="pre">util_py</span></tt> folder.  All methods return a <a class="reference internal" href="molecule.html"><em>Molecule</em></a> object, which may then be added to the relevent rigid fix.  Methods include <tt class="docutils literal"><span class="pre">create_TIP3P</span></tt> (Jorgensen JCP, 1983), <tt class="docutils literal"><span class="pre">create_TIP3P_long</span></tt> (Price, JCP, 2004), <tt class="docutils literal"><span class="pre">create_TIP4P</span></tt> (Jorgensen JCP, 1983), <tt class="docutils literal"><span class="pre">create_TIP4P_long</span></tt> (Price, JCP, 2004), <tt class="docutils literal"><span class="pre">create_TIP4P_2005</span></tt> (Vega, JCP, 2005).  Note that
+Lennard-Jones parameters must be initialized by the user.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;/path/to/util_py/&#39;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">water</span>
+
+<span class="c">#returns Molecule object</span>
+<span class="n">tip3p</span> <span class="o">=</span> <span class="n">water</span><span class="o">.</span><span class="n">create_TIP3P</span><span class="p">()</span>
+
+
+<span class="n">myRigidFix</span><span class="o">.</span><span class="n">createRigid</span><span class="p">(</span><span class="n">tip3p</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="deleting-atoms">
+<h2>Deleting atoms<a class="headerlink" href="#deleting-atoms" title="Permalink to this headline">¶</a></h2>
+<p>Atoms can also be deleted from the <tt class="docutils literal"><span class="pre">state</span></tt>.</p>
+<p>Atoms can be introduced into the simulation by adding them directly to the <tt class="docutils literal"><span class="pre">state</span></tt> or by using the <tt class="docutils literal"><span class="pre">InitializeAtoms</span></tt> tools.  The first method is described below and the second is discussed elsewhere.</p>
+<p><strong>state.deleteAtom(</strong> a <strong>)</strong></p>
+<p>Deletes the specified atom from the <tt class="docutils literal"><span class="pre">state</span></tt> and all associated fixes.</p>
+<p><strong>Arguments</strong></p>
+<p><tt class="docutils literal"><span class="pre">a</span></tt>: An atom object</p>
+<p><strong>Returns</strong></p>
+<p><tt class="docutils literal"><span class="pre">bool</span></tt>: A boolean.  <tt class="docutils literal"><span class="pre">True</span></tt> means the atom was successfully deleted.</p>
+<p><strong>Example</strong></p>
+<p>The following code demonstrates this method of removing atoms into the simulation using the water example from above:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Suppose our AtomParams object has atom types &#39;spc1&#39;</span>
+
+<span class="c">#create new positions for the atom</span>
+<span class="n">posO</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c">#add the atoms</span>
+<span class="n">state</span><span class="o">.</span><span class="n">addAtom</span><span class="p">(</span><span class="s">&#39;spc1&#39;</span><span class="p">,</span> <span class="n">posO</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.834</span><span class="p">)</span>
+
+<span class="c">#delete the atoms</span>
+<span class="n">state</span><span class="o">.</span><span class="n">deleteAtom</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Atoms</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#adding-atoms-to-the-simulation">Adding atoms to the simulation</a></li>
+<li><a class="reference internal" href="#accessing-and-updating-atom-data">Accessing and updating atom data</a></li>
+<li><a class="reference internal" href="#setting-atom-parameters">Setting atom parameters</a><ul>
+<li><a class="reference internal" href="#class-atomparams">Class AtomParams</a></li>
+<li><a class="reference internal" href="#methods">Methods</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tools-for-initializing-atoms">Tools for initializing atoms</a><ul>
+<li><a class="reference internal" href="#randomly-populate-the-simulation-box">Randomly populate the simulation box</a></li>
+<li><a class="reference internal" href="#initialize-atom-velocities">Initialize atom velocities</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#water-molecules">Water molecules</a></li>
+<li><a class="reference internal" href="#deleting-atoms">Deleting atoms</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="reading-trajectories.html"
+                        title="previous chapter">Reading trajectories</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Bounds.html"
+                        title="next chapter">Bounds</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/Atoms.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Bounds.html" title="Bounds"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="reading-trajectories.html" title="Reading trajectories"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

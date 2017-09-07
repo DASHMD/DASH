@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Writing Trajectories &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="Reading trajectories" href="reading-trajectories.html" />
+    <link rel="prev" title="Recording Data" href="data-recording.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="reading-trajectories.html" title="Reading trajectories"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="data-recording.html" title="Recording Data"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="writing-trajectories">
+<h1>Writing Trajectories<a class="headerlink" href="#writing-trajectories" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Write a restart file every <tt class="docutils literal"><span class="pre">writeEvery</span></tt> turns in <tt class="docutils literal"><span class="pre">xyz</span></tt> or DASH-specific <tt class="docutils literal"><span class="pre">xml</span></tt> format.  A <tt class="docutils literal"><span class="pre">WriteConfig</span></tt> object must be created as shown below.  At this point, the <tt class="docutils literal"><span class="pre">write()</span></tt> method can be called to immediately write a configuration, or the <tt class="docutils literal"><span class="pre">WriteConfig</span></tt> can be activated and configurations will be written every <tt class="docutils literal"><span class="pre">writeEvery</span></tt> turns.</p>
+<p>Output is performed asynchonously, allowing restarts to be written frequently with minimal performance impact.</p>
+<p>If units are set as real and <tt class="docutils literal"><span class="pre">format</span></tt> is <tt class="docutils literal"><span class="pre">xyz</span></tt>, atomic numbers for the <tt class="docutils literal"><span class="pre">xyz</span></tt> for will be guessed from the atomic mass.  If the atomic number cannot be guessed, the atom type will be used.</p>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Basic usage</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Create WriteConfig object which will write configurations</span>
+<span class="c">#to myRestartFile.xml every 1000 turns.  Multiple configurations</span>
+<span class="c">#are written to the same xml file</span>
+<span class="n">writeConfig</span> <span class="o">=</span> <span class="n">WriteConfig</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="s">&quot;myRestartFile&quot;</span><span class="p">,</span> <span class="n">writeEvery</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="s">&quot;writer1&quot;</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&quot;xml&quot;</span><span class="p">)</span>
+
+<span class="c">#write a configuration</span>
+<span class="n">writeConfig</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+
+<span class="c">#active the writer.  Now turns will be written every 100 turns.</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateWriteConfig</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Writing one file per config (can be done with any format)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Adding a * to the file name tells DASH to create</span>
+<span class="c">#one file per configuration where the current</span>
+<span class="c">#turn is substituted for *</span>
+<span class="n">oneFilePerConfig</span> <span class="o">=</span> <span class="n">WriteConfig</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="s">&quot;myRestartFile_*&quot;</span><span class="p">,</span> <span class="n">writeEvery</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="s">&quot;writer1&quot;</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&quot;xml&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Writing <tt class="docutils literal"><span class="pre">xyz</span></tt> files</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Writing xyz</span>
+<span class="n">oneFilePerConfig</span> <span class="o">=</span> <span class="n">WriteConfig</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="s">&quot;myRestartFile_*&quot;</span><span class="p">,</span> <span class="n">writeEvery</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="s">&quot;writer1&quot;</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&quot;xyz&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="constructor">
+<h2>Constructor<a class="headerlink" href="#constructor" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">WriteConfig</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">format</span><span class="p">,</span> <span class="n">writeEvery</span><span class="p">,</span> <span class="n">groupHandle</span><span class="p">,</span> <span class="n">unwrapMolecules</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">state</span></tt></dt>
+<dd>State to output</dd>
+<dt><tt class="docutils literal"><span class="pre">fn</span></tt></dt>
+<dd>Output filename.  Named argument.  File extension is automatically appended.</dd>
+<dt><tt class="docutils literal"><span class="pre">handle</span></tt></dt>
+<dd>A name for the object.  Named argument.</dd>
+<dt><tt class="docutils literal"><span class="pre">writeEvery</span></tt></dt>
+<dd>Write file every <tt class="docutils literal"><span class="pre">writeEvery</span></tt> turns.  Named argument.</dd>
+<dt><tt class="docutils literal"><span class="pre">groupHandle</span></tt></dt>
+<dd>Group of atoms to output.  Named argument.  Defaults to <tt class="docutils literal"><span class="pre">all</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">unwrapMolecules</span></tt></dt>
+<dd>Unwrap <tt class="docutils literal"><span class="pre">Molecule</span></tt> objects across periodic boundaries</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Writing Trajectories</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#constructor">Constructor</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="data-recording.html"
+                        title="previous chapter">Recording Data</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="reading-trajectories.html"
+                        title="next chapter">Reading trajectories</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/writing-trajectories.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="reading-trajectories.html" title="Reading trajectories"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="data-recording.html" title="Recording Data"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

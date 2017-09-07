@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Intergrator Verlet &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="Intergrator FIRE relaxation" href="integrator-relax.html" />
+    <link rel="prev" title="Isokinetic Thermostat" href="fix-NVT-rescale.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="integrator-relax.html" title="Intergrator FIRE relaxation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fix-NVT-rescale.html" title="Isokinetic Thermostat"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="intergrator-verlet">
+<h1>Intergrator Verlet<a class="headerlink" href="#intergrator-verlet" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Integrating state via two step velocity-Verlet</p>
+<div class="math">
+\[\begin{split}{\bf v}_i\left(t+\frac{1}{2}\Delta t\right) &amp;=&amp; {\bf v}_i\left(t\right) + \frac{1}{2}\frac{{\bf f}_i\left(t\right)}{m_i}\Delta t\\
+{\bf r}_i\left(t+\Delta t\right) &amp;=&amp; {\bf r}_i\left(t\right) + {\bf v}_i\left(t+\frac{1}{2}\Delta t\right)\Delta t\\
+{\bf v}_i\left(t+\Delta t\right) &amp;=&amp; {\bf v}_i\left(t+{\Delta t}/{2}\right)+\frac{1}{2}\frac{{\bf f}_i\left(t+\Delta t\right)}{m_i}\Delta t\end{split}\]</div>
+<p>where <span class="math">\({\bf r}_{i}\)</span> is coordinate of particle <span class="math">\(i\)</span>, <span class="math">\({\bf v}_i\)</span> is  velocity of particle <span class="math">\(i\)</span>, <span class="math">\({\bf f}_i\)</span> is sum of all forces acting on particle <span class="math">\(i\)</span>, <span class="math">\(m_i\)</span> is  mass particle <span class="math">\(i\)</span>, and <span class="math">\(\Delta t\)</span> is timestep size.
+The timestep size is set through <tt class="docutils literal"><span class="pre">state</span></tt> variable:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">state</span><span class="o">.</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="python-member-functions">
+<h2>Python Member Functions<a class="headerlink" href="#python-member-functions" title="Permalink to this headline">¶</a></h2>
+<p>Constructor</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">IntegratorVerlet</span><span class="p">(</span><span class="n">state</span><span class="o">=...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">state</span></tt></dt>
+<dd>state object.</dd>
+</dl>
+<p>Integrating state is done with <tt class="docutils literal"><span class="pre">run</span></tt>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">run</span><span class="p">(</span><span class="n">numTurns</span><span class="o">=...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">numTurns</span></tt></dt>
+<dd>number of timestep to make.</dd>
+</dl>
+<p>TODO Write Output?</p>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Adding the integrator</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">integrater</span> <span class="o">=</span> <span class="n">IntegratorVerlet</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Setting parameters in python</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">state</span><span class="o">.</span><span class="n">shoutEvery</span><span class="o">=</span><span class="mi">1000</span>
+<span class="n">state</span><span class="o">.</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span>
+</pre></div>
+</div>
+<p>integrating system forward in time</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#run 1E5 timesteps</span>
+<span class="n">integrater</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">100000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Intergrator Verlet</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#python-member-functions">Python Member Functions</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fix-NVT-rescale.html"
+                        title="previous chapter">Isokinetic Thermostat</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="integrator-relax.html"
+                        title="next chapter">Intergrator FIRE relaxation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/integrator-Verlet.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="integrator-relax.html" title="Intergrator FIRE relaxation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fix-NVT-rescale.html" title="Isokinetic Thermostat"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

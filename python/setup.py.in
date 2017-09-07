@@ -1,0 +1,22 @@
+from distutils.core import setup, Extension
+
+incDirsPy = '${PY_INC_DIRS}'.split(';')
+
+module1 = Extension('${MD_ENGINE_LIB_NAME}',
+                    sources = ['${SIM_SOURCES}'],
+                    library_dirs = ["${CMAKE_BINARY_DIR}"],
+                    libraries = ["${MD_ENGINE_LIB_NAME}"],
+                    include_dirs = incDirsPy + 
+                                    ["${CUDA_INCLUDE_DIRS}"],
+                    runtime_library_dirs = ["${CMAKE_INSTALL_PREFIX}/lib"],
+                    extra_compile_args = "${CMAKE_CXX_FLAGS}".split()
+                    )
+
+setup(name='${MD_ENGINE_LIB_NAME}',
+      version='${VERSION_MAJOR}.${VERSION_MINOR}',
+      description='A GPU-accelerated Molecular Dynamics simulation engine',
+      author='Daniel Reid',
+      author_email='danielreid@uchicago.edu',
+      package_dir={ '': '${CMAKE_CURRENT_SOURCE_DIR}' },
+      ext_modules=[module1],
+      )

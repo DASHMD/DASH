@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Ewald potential with long-range Coulomb interactions &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="LJ Wall Potential" href="fix-wall-LJ126.html" />
+    <link rel="prev" title="DSF Charge Pair potential" href="fix-charge-DSF.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fix-wall-LJ126.html" title="LJ Wall Potential"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fix-charge-DSF.html" title="DSF Charge Pair potential"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="ewald-potential-with-long-range-coulomb-interactions">
+<h1>Ewald potential with long-range Coulomb interactions<a class="headerlink" href="#ewald-potential-with-long-range-coulomb-interactions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Long range Coulomb interactions implemented from Deserno and Holm, J.Chem.Phys. 109, 7678, 1998. The idea of the method is to accurately include periodic boundary conditions in Coulomb potential calculation,and allow particles to interact with infinite amount of simulation box images. This is done by separation of Coulomb potential into short-range pairwise part and long-range part. Short-range part force is:</p>
+<div class="math">
+\[\begin{split}F_{\rm short}({\bf r}_{ij}) =  \left[\begin{array}{cc}  q_i q_j \left(\frac{2\alpha}{\sqrt{\pi}}{\rm exp}(-\alpha^2 r_{ij}^2)+\frac{{\rm erfc}(\alpha r)}{r}\right)\frac{{\bf r}_{ij}}{r_{ij}^2},&amp; r&lt;r_{\rm cut}\\
+                 0, &amp; r\geq r_{\rm cut}
+                 \end{array}\right.\end{split}\]</div>
+<p>The long-range part calculation requires mapping pariticle charges to a mesh, calculating energy and electric field  at mesh points assuming large number of periodic images through Fourier space. Then forces on particles are calculated through:</p>
+<div class="math">
+\[F_{{\rm long},i} = q_i \sum_{{\bf r}_{\rm p}\in {\mathcal M}} {\bf E}({\bf r}_{\rm p}) W({\bf r}_{\rm i}-{\bf r}_{\rm p})\]</div>
+<p>where <span class="math">\(q_i, q_j\)</span> are charges of particles <span class="math">\(i,j\)</span>, <span class="math">\(r_{ij}\)</span> is the distance between particles <span class="math">\(i,j\)</span>, <span class="math">\(\alpha\)</span> is splitting parameter, <span class="math">\({\bf r}_{\rm p}\)</span> is coordinates of mesh points, <span class="math">\(W({\bf r})\)</span> is charge assignment function and <span class="math">\(r_{\rm cut}\)</span> is cutoff distance.</p>
+<p><tt class="docutils literal"><span class="pre">FixChargeEwald</span></tt> reports root mean square (RMS) force error from analytical approximation.</p>
+</div>
+<div class="section" id="python-member-functions">
+<h2>Python Member Functions<a class="headerlink" href="#python-member-functions" title="Permalink to this headline">¶</a></h2>
+<p>Adding Fix</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">FixChargeEwald</span><span class="p">(</span><span class="n">state</span><span class="o">=...</span><span class="p">,</span> <span class="n">handle</span><span class="o">=...</span><span class="p">,</span><span class="n">group_handle</span><span class="o">=...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">state</span></tt></dt>
+<dd>state object to add the fix.</dd>
+<dt><tt class="docutils literal"><span class="pre">handle</span></tt></dt>
+<dd>A name for the fix.</dd>
+<dt><tt class="docutils literal"><span class="pre">group_handle</span></tt></dt>
+<dd>Group name to apply potential.</dd>
+</dl>
+<p>Setting parameters from within the Python environment is done with <tt class="docutils literal"><span class="pre">setParameters</span></tt>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">setParameters</span><span class="p">(</span><span class="n">szx</span><span class="o">=...</span><span class="p">,</span><span class="n">szy</span><span class="o">=...</span><span class="p">,</span><span class="n">szz</span><span class="o">=...</span><span class="p">,</span> <span class="n">r_cut</span><span class="o">=...</span><span class="p">,</span> <span class="n">interpolation_order</span><span class="o">=...</span><span class="p">)</span>
+<span class="n">setParameters</span><span class="p">(</span><span class="n">sz</span><span class="o">=...</span><span class="p">,</span> <span class="n">r_cut</span><span class="o">=...</span><span class="p">,</span> <span class="n">interpolation_order</span><span class="o">=...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">szx,szy,szz</span></tt></dt>
+<dd>number of mesh points in x,y,z axis. Can be set to 32,64,128,256,512,1024</dd>
+<dt><tt class="docutils literal"><span class="pre">sz</span></tt></dt>
+<dd>number of mesh points for all axes. Can be set to 32,64,128,256,512,1024</dd>
+<dt><tt class="docutils literal"><span class="pre">r_cut</span></tt></dt>
+<dd>cutoff raduis for a short-range pairwise part. By default value is taken from <tt class="docutils literal"><span class="pre">state</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">interpolation_order</span></tt></dt>
+<dd>number of mesh points included into charge assignment function. Implemented orders are 1,3. Default is 3.</dd>
+</dl>
+<p>It is possible to set required RMS error instead of mesh size with <tt class="docutils literal"><span class="pre">setError</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">setError</span><span class="p">(</span><span class="n">error</span><span class="o">=...</span><span class="p">,</span> <span class="n">r_cut</span><span class="o">=...</span><span class="p">,</span> <span class="n">interpolation_order</span><span class="o">=...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">error</span></tt></dt>
+<dd>required root mean square (RMS) force error.</dd>
+<dt><tt class="docutils literal"><span class="pre">r_cut</span></tt></dt>
+<dd>cutoff raduis for a short-range pairwise part. By default value is taken from <tt class="docutils literal"><span class="pre">state</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">interpolation_order</span></tt></dt>
+<dd>number of mesh points included into charge assignment function. Implemented orders are 1,3.</dd>
+</dl>
+<p>It is possible to avoid updating long-range part every timestep with <tt class="docutils literal"><span class="pre">setLongRangeInterval</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">setLongRangeInterval</span><span class="p">(</span><span class="n">interval</span><span class="o">=...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">interval</span></tt></dt>
+<dd>number of timestep between long-range part updates. By default <tt class="docutils literal"><span class="pre">FixChargeEwald</span></tt> calculates long-range part every timestep.</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Adding the fix</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#adding charge fix</span>
+<span class="n">charge</span><span class="o">=</span><span class="n">FixChargeEwald</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&quot;charge&quot;</span><span class="p">,</span> <span class="s">&quot;all&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Setting parameters in python</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#64 grid points in each dimension, cutoff of rCut-1</span>
+<span class="c">#interpolating charge to three mesh points</span>
+<span class="n">charge</span><span class="o">.</span><span class="n">setParameters</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">rCut</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+
+<span class="c">#alternatively, one could let DASH determinine the</span>
+<span class="c">#grid discretization by setting an error tolerance</span>
+<span class="c">#(1e-2 here)</span>
+<span class="c">#charge.setError(1e-2)</span>
+</pre></div>
+</div>
+<p>Activating the fix</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Activate fix</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">charge</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Ewald potential with long-range Coulomb interactions</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#python-member-functions">Python Member Functions</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fix-charge-DSF.html"
+                        title="previous chapter">DSF Charge Pair potential</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fix-wall-LJ126.html"
+                        title="next chapter">LJ Wall Potential</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/fix-charge-Ewald.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="fix-wall-LJ126.html" title="LJ Wall Potential"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fix-charge-DSF.html" title="DSF Charge Pair potential"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

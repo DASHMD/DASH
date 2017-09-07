@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Fix Langevin &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="Andersen Thermostat" href="fix-NVT-Andersen.html" />
+    <link rel="prev" title="Berendsen Barostat" href="fix-pressure-Berendsen.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fix-NVT-Andersen.html" title="Andersen Thermostat"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fix-pressure-Berendsen.html" title="Berendsen Barostat"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="fix-langevin">
+<h1>Fix Langevin<a class="headerlink" href="#fix-langevin" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>FixLangevin applies stochastic forces to particles in the system via Langevin dynamics</p>
+<div class="math">
+\[{\bf f}_i = -\gamma {\bf v}_i+\sqrt{6k_{\rm B}T\gamma/\Delta t }{\bf W}_i\]</div>
+<p>where <span class="math">\({\bf v}_i\)</span> is  velocity of particle <span class="math">\(i\)</span>, <span class="math">\(\Delta t\)</span> is timestep size, <span class="math">\(T\)</span> is temperature, <span class="math">\(\gamma\)</span> is a drag parameter, and <span class="math">\({\bf W}_i\)</span> is a Wiener vector.</p>
+</div>
+<div class="section" id="python-member-functions">
+<h2>Python Member Functions<a class="headerlink" href="#python-member-functions" title="Permalink to this headline">¶</a></h2>
+<p>Constructors</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">FixLangevin</span><span class="p">(</span><span class="n">state</span><span class="o">=...</span><span class="p">,</span> <span class="n">handle</span><span class="o">=...</span><span class="p">,</span>  <span class="n">groupHandle</span><span class="o">=...</span><span class="p">,</span>  <span class="n">temp</span><span class="o">=...</span><span class="p">)</span>
+<span class="n">FixLangevin</span><span class="p">(</span><span class="n">state</span><span class="o">=...</span><span class="p">,</span> <span class="n">handle</span><span class="o">=...</span><span class="p">,</span>  <span class="n">groupHandle</span><span class="o">=...</span><span class="p">,</span>  <span class="n">tempFunc</span><span class="o">=...</span><span class="p">)</span>
+<span class="n">FixLangevin</span><span class="p">(</span><span class="n">state</span><span class="o">=...</span><span class="p">,</span> <span class="n">handle</span><span class="o">=...</span><span class="p">,</span>  <span class="n">groupHandle</span><span class="o">=...</span><span class="p">,</span>  <span class="n">intervals</span><span class="o">=...</span> <span class="p">,</span> <span class="n">temps</span><span class="o">=...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">state</span></tt></dt>
+<dd>state object.</dd>
+<dt><tt class="docutils literal"><span class="pre">handle</span></tt></dt>
+<dd>A name for the fix.</dd>
+<dt><tt class="docutils literal"><span class="pre">group_handle</span></tt></dt>
+<dd>Group name to apply fix.</dd>
+<dt><tt class="docutils literal"><span class="pre">temp</span></tt></dt>
+<dd>Constant Temperature.</dd>
+</dl>
+<p>There are few options to change temperature dynamically:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">tempFunc</span></tt></dt>
+<dd>Python function that returns a temperature at timestep.</dd>
+<dt><tt class="docutils literal"><span class="pre">intervals,</span> <span class="pre">temps</span></tt></dt>
+<dd>Python lists of temperatures and intevals for linear interpolation.</dd>
+</dl>
+<p>Setting parameters from within the Python environment is done with <tt class="docutils literal"><span class="pre">setParameters</span></tt>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">setParameters</span><span class="p">(</span><span class="n">seed</span><span class="o">=...</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">seed</span></tt></dt>
+<dd>seed for random number generator</dd>
+<dt><tt class="docutils literal"><span class="pre">gamma</span></tt></dt>
+<dd><span class="math">\(\gamma\)</span> drag parameter.</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Adding the integrator</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">fixLangevin</span><span class="o">=</span><span class="n">FixLangevin</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="s">&#39;Lang&#39;</span><span class="p">,</span><span class="n">groupHandle</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span><span class="n">temp</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Setting parameters in python</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">fixLangevin</span><span class="o">.</span><span class="n">setParameters</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">1234</span><span class="p">,</span><span class="n">gamma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Activating the fix</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Activate fix</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">fixLangevin</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Fix Langevin</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#python-member-functions">Python Member Functions</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fix-pressure-Berendsen.html"
+                        title="previous chapter">Berendsen Barostat</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fix-NVT-Andersen.html"
+                        title="next chapter">Andersen Thermostat</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/fix-Langevin.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="fix-NVT-Andersen.html" title="Andersen Thermostat"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fix-pressure-Berendsen.html" title="Berendsen Barostat"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,4 @@
+units real
+atom_style full
+boundary p p p 
+read_data poly_min.data

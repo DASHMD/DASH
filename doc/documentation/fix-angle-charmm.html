@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>CHARMM Angle Style &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="Cosine Angle Style" href="fix-angle-cosinedelta.html" />
+    <link rel="prev" title="Harmonic Angle Style" href="fix-angle-harmonic.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fix-angle-cosinedelta.html" title="Cosine Angle Style"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fix-angle-harmonic.html" title="Harmonic Angle Style"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="charmm-angle-style">
+<h1>CHARMM Angle Style<a class="headerlink" href="#charmm-angle-style" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Define a three-body potential energy function corresponding to the CHARMM angle style</p>
+<div class="math">
+\[U_{ijk} = \frac{1}{2}K(\theta - \theta_0)^2 + \frac{1}{2}K_{\text{ub}}(r-r_{\text{ub}})^2,\]</div>
+<p>where <span class="math">\(K, \theta_0, K_{\text{ub}}, r_{\text{ub}}\)</span> are coefficients that must be set to define the interaction between atoms <span class="math">\(i, j, k\)</span> .</p>
+<p>Angles and types can be defined directly within the python input script, read from a LAMMPS data file (using the LAMMPS reader utility), read from a NAMD input file (using the NAMD reader utility) or read from a restart file.</p>
+</div>
+<div class="section" id="python-member-functions">
+<h2>Python Member Functions<a class="headerlink" href="#python-member-functions" title="Permalink to this headline">¶</a></h2>
+<p>Setting angle types and angles from within the Python environment is done with simple invocations. Parameters with <tt class="docutils literal"><span class="pre">=</span></tt> may be given in any order and are also optionally specified. For example, if an existing angle type has already been set, it is unneccessary to specify its parameters again when creating an angle for three atoms.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">setAngleTypeCoefs</span><span class="p">(</span><span class="n">k</span><span class="o">=...</span><span class="p">,</span><span class="n">theta0</span><span class="o">=...</span><span class="p">,</span><span class="n">kub</span><span class="o">=...</span><span class="p">,</span><span class="n">rub</span><span class="o">=...</span><span class="p">,</span><span class="nb">type</span><span class="o">=...</span><span class="p">)</span>
+<span class="n">createAngle</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">k</span><span class="o">=...</span><span class="p">,</span><span class="n">theta0</span><span class="o">=...</span><span class="p">,</span><span class="n">kub</span><span class="o">=...</span><span class="p">,</span><span class="n">rub</span><span class="o">=...</span><span class="p">,</span><span class="nb">type</span><span class="o">=...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">a,b,c</span></tt></dt>
+<dd>Indices for atoms for which the angle is defined.</dd>
+<dt><tt class="docutils literal"><span class="pre">k</span></tt></dt>
+<dd>Spring constant coefficient for harmonic interaction.</dd>
+<dt><tt class="docutils literal"><span class="pre">theta0</span></tt></dt>
+<dd>Equilbrium angle for harmonic angle interaction (specified in radians).</dd>
+<dt><tt class="docutils literal"><span class="pre">kub</span></tt></dt>
+<dd>Urey-Bradley coefficient for 1-3 interaction.</dd>
+<dt><tt class="docutils literal"><span class="pre">rub</span></tt></dt>
+<dd>Equilibrium Urey-Bradley separation distance.</dd>
+<dt><tt class="docutils literal"><span class="pre">type</span></tt></dt>
+<dd>Integer indicating the angle type assignment</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Adding the fix</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Add Fix for CHARMM angle style</span>
+<span class="n">anglePot</span> <span class="o">=</span> <span class="n">FixAngleCHARMM</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="s">&#39;anglePot&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Setting angle type coefficients in python</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Setting angle types</span>
+<span class="n">anglePot</span><span class="o">.</span><span class="n">setAngleTypeCoefs</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span><span class="n">theta0</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mf">3.</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Defining an angle type in python</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Creating an angle between atoms 1,2,3</span>
+<span class="n">a</span><span class="o">=</span><span class="mi">1</span>     <span class="c"># index for atom 1</span>
+<span class="n">b</span><span class="o">=</span><span class="mi">2</span>     <span class="c"># index for atom 2</span>
+<span class="n">c</span><span class="o">=</span><span class="mi">3</span>     <span class="c"># index for atom 3</span>
+<span class="n">d</span><span class="o">=</span><span class="mi">3</span>     <span class="c"># index for atom 4</span>
+<span class="n">anglePot</span><span class="o">.</span><span class="n">createAngle</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c"># create angle and implicitly create type</span>
+<span class="n">anglePot</span><span class="o">.</span><span class="n">createAngle</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">,</span><span class="n">k</span><span class="o">=</span><span class="mf">80.0</span><span class="p">,</span><span class="n">theta0</span><span class="o">=</span><span class="n">pi</span><span class="o">*</span><span class="mf">100.</span><span class="o">/</span><span class="mf">180.</span><span class="p">,</span><span class="n">kub</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span><span class="n">rub</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Activating the fix</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Activate fix</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">anglePot</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="lammps-data-file-parameter-order">
+<h2>LAMMPS data file parameter order<a class="headerlink" href="#lammps-data-file-parameter-order" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">angle_coeff</span> <span class="nb">type</span> <span class="n">k</span> <span class="n">theta0</span> <span class="n">kub</span> <span class="n">rub</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CHARMM Angle Style</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#python-member-functions">Python Member Functions</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#lammps-data-file-parameter-order">LAMMPS data file parameter order</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fix-angle-harmonic.html"
+                        title="previous chapter">Harmonic Angle Style</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fix-angle-cosinedelta.html"
+                        title="next chapter">Cosine Angle Style</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/fix-angle-charmm.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="fix-angle-cosinedelta.html" title="Cosine Angle Style"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fix-angle-harmonic.html" title="Harmonic Angle Style"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

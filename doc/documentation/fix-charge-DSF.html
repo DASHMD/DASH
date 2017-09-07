@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>DSF Charge Pair potential &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="Ewald potential with long-range Coulomb interactions" href="fix-charge-Ewald.html" />
+    <link rel="prev" title="TICG pair potential" href="fix-pair-TICG.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fix-charge-Ewald.html" title="Ewald potential with long-range Coulomb interactions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fix-pair-TICG.html" title="TICG pair potential"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="dsf-charge-pair-potential">
+<h1>DSF Charge Pair potential<a class="headerlink" href="#dsf-charge-pair-potential" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Pairwise force shifted damped Coulomb as defined by
+Christopher J. Fennel and J. Daniel Gezelter J. Chem. Phys (124), 234104 2006
+Eqn 19.</p>
+<div class="math">
+\[\begin{split}F(r_{ij}) =  \left[\begin{array}{cc}  q_i q_j \left(\frac{{\rm erf}(\alpha r)}{r^2} +\frac{2\alpha}{\sqrt{\pi}} \frac{{\rm exp}(-\alpha^2 r^2    )}{r}  -\frac{{\rm erf}(\alpha r_{\rm cut})}{r_{\rm cut}^2}+\frac{2\alpha}{\sqrt{\pi}}\frac{{\rm exp}(-\alpha^2 r_{\rm cut}^2)}{r_{\rm cut}}\right),&amp; r&lt;r_{\rm cut}\\
+                 0, &amp; r\geq r_{\rm cut}
+                 \end{array}\right.\end{split}\]</div>
+<p>where <span class="math">\(q_i, q_j\)</span> are charges of particles <span class="math">\(i,j\)</span>, <span class="math">\(r_{ij}\)</span> is the distance between particles <span class="math">\(i,j\)</span>, <span class="math">\(\alpha\)</span> is  convergence parameter, and <span class="math">\(r_{\rm cut}\)</span> is cutoff distance.</p>
+<p>parameters of potential can be defined directly within the python input script, or read from a restart file.</p>
+</div>
+<div class="section" id="python-member-functions">
+<h2>Python Member Functions<a class="headerlink" href="#python-member-functions" title="Permalink to this headline">¶</a></h2>
+<p>Adding Fix</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">FixChargePairDSF</span><span class="p">(</span><span class="n">state</span><span class="o">=...</span><span class="p">,</span> <span class="n">handle</span><span class="o">=...</span><span class="p">,</span><span class="n">group_handle</span><span class="o">=...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">state</span></tt></dt>
+<dd>state object to add the fix.</dd>
+<dt><tt class="docutils literal"><span class="pre">handle</span></tt></dt>
+<dd>A name for the fix.</dd>
+<dt><tt class="docutils literal"><span class="pre">group_handle</span></tt></dt>
+<dd>A group name to apply potential.</dd>
+</dl>
+<p>Setting parameters from within the Python environment is done with <tt class="docutils literal"><span class="pre">setParameters</span></tt>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">setParameters</span><span class="p">(</span><span class="n">alpha</span><span class="o">=...</span><span class="p">,</span><span class="n">r_cut</span><span class="o">=...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">alpha</span></tt></dt>
+<dd><p class="first">name of parameter to set. Can be <tt class="docutils literal"><span class="pre">eps</span></tt>, <tt class="docutils literal"><span class="pre">sig</span></tt>, <tt class="docutils literal"><span class="pre">rCut</span></tt>.</p>
+<p class="last"><tt class="docutils literal"><span class="pre">rCut</span></tt> parameter has a default value equal to <tt class="docutils literal"><span class="pre">state.rCut</span></tt>.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">r_cut</span></tt></dt>
+<dd>Cutoff radius for charge calculations</dd>
+</dl>
+<p>Default parameter values are <span class="math">\(\alpha=0.25\)</span>, <span class="math">\(r_{\rm cut}=9.0\)</span>, assuming <span class="math">\(\sigma_{\rm LJ}=1.0\)</span></p>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Adding the fix</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#adding charge fix</span>
+<span class="n">charge</span><span class="o">=</span><span class="n">FixChargePairDSF</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&quot;charge&quot;</span><span class="p">,</span><span class="s">&quot;all&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Setting parameters in python</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">charge</span><span class="o">.</span><span class="n">setParameters</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span><span class="n">r_cut</span><span class="o">=</span><span class="mf">9.0</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Activating the fix</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Activate fix</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">charge</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">DSF Charge Pair potential</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#python-member-functions">Python Member Functions</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fix-pair-TICG.html"
+                        title="previous chapter">TICG pair potential</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fix-charge-Ewald.html"
+                        title="next chapter">Ewald potential with long-range Coulomb interactions</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/fix-charge-DSF.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="fix-charge-Ewald.html" title="Ewald potential with long-range Coulomb interactions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fix-pair-TICG.html" title="TICG pair potential"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

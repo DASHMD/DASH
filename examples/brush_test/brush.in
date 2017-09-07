@@ -1,0 +1,65 @@
+#------------- Init Section ---------------
+
+include "brush.init"
+#------------- Particle Definitions ------------ 
+
+read_data "brush.data"
+#------------- Settings Section ----------- 
+
+include "brush.settings"
+#------------- Run Section ----------- 
+
+thermo 2000
+run_style verlet
+timestep 0.005
+
+restart 50000 brush.restart
+
+#SIMULATION BOX FIXES
+
+group substrates type 1 
+group bot_substr id <= 4
+group top_substr subtract substrates bot_substr
+group polymers type 2
+group ctr_ions type 3
+group dump_group subtract all top_substr
+fix 1 substrates setforce 0.0 0.0 0.0
+group not_substr subtract all substrates
+fix wall1 not_substr wall/lj126 zlo EDGE 0.1 1.0 2.5 
+fix wall2 not_substr wall/lj126 zhi EDGE 0.1 1.0 2.5 
+
+compute real_temp not_substr temp
+thermo_style custom step dt c_real_temp press vol etotal ke pe ebond eangle evdwl ecoul elong
+
+#Minimize the simulation box. 
+fix poly_hold polymers setforce 0.0 0.0 0.0
+minimize 1.0e-6 1.0e-6 2000 2000
+
+unfix poly_hold
+
+#Initial Safe Equilibration to remove bad contacts
+velocity not_substr create 1.0 76486454
+fix temper not_substr nve/limit 0.1
+fix temper2 not_substr langevin 1.0 1.0 100.0 986537
+fix rescale0 not_substr temp/rescale 2 1.0 1.0 0.2 1.0
+dump 1 dump_group custom 2000 equil.trj id type x y z
+run 200000
+unfix rescale0
+unfix temper2
+unfix temper
+undump 1
+
+#Run NVT Sampling
+fix 11 not_substr nve
+fix 3 not_substr langevin 1.0 1.0 100.0 22265580
+dump 2 polymers custom 2000 polymers.trj id type q xu yu zu
+dump 55 polymers custom 2000 poly_wrap.trj id type q x y z
+dump 3 ctr_ions custom 2000 ctrions.trj id type q x y z
+run 200000
+unfix 3
+unfix 11
+undump 2
+
+undump 55
+
+undump 3

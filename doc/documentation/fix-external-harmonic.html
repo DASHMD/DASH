@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>External Harmonic Potential Fix &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="External Quartic Potential Fix" href="fix-external-quartic.html" />
+    <link rel="prev" title="Harmonic Wall Potential" href="fix-wall-harmonic.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fix-external-quartic.html" title="External Quartic Potential Fix"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fix-wall-harmonic.html" title="Harmonic Wall Potential"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="external-harmonic-potential-fix">
+<h1>External Harmonic Potential Fix<a class="headerlink" href="#external-harmonic-potential-fix" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Applies an external potential to a group of atoms to mimic confinement in a harmonic well.</p>
+<div class="math">
+\[U_{\text{ext}} = \frac{1}{2} \sum_{d=x,y,z} k_d(r_d - r_{d0})^2,\]</div>
+<p>where <span class="math">\(\mathbf{k}=(k_x,k_y,k_z), \mathbf{r}_0=(r_{x0},r_{y0},r_{z0})\)</span> are <tt class="docutils literal"><span class="pre">Vector</span></tt> parameters that must be set to define the harmonic well. As the parameters are vectors, one- and two-dimensional harmonic potentials may be created by setting some of the spring coefficients to zero.</p>
+<p>The harmonic potentials are defined directly within the python input script as a <tt class="docutils literal"><span class="pre">Fix</span></tt> using its constructor.</p>
+</div>
+<div class="section" id="constructor">
+<h2>Constructor<a class="headerlink" href="#constructor" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">FixExternalHarmonic</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="n">handle</span><span class="p">,</span><span class="n">groupHandle</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">r0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">state</span></tt></dt>
+<dd>Simulation state to apply the fix.</dd>
+<dt><tt class="docutils literal"><span class="pre">handle</span></tt></dt>
+<dd>A name for the object.  Named argument.</dd>
+<dt><tt class="docutils literal"><span class="pre">groupHandle</span></tt></dt>
+<dd>Group of atoms to which the fix is applied.  Named argument.  Defaults to <tt class="docutils literal"><span class="pre">all</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">k</span></tt></dt>
+<dd>Vector of spring constant coefficient for <span class="math">\(k_x,k_y,k_z\)</span>  for strength of confining potential in each dimension. These are specified as <tt class="docutils literal"><span class="pre">Vector(kx,ky,kz)</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">r0</span></tt></dt>
+<dd>Vector of minima <span class="math">\(r_{x0},r_{y0},r_{z0}\)</span> in each dimension for the harmonic potential. These are specified as <tt class="docutils literal"><span class="pre">Vector(rx,ry,rz)</span></tt>.</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Adding and activating the fix</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Add Fix for external harmonic potential</span>
+<span class="n">UextHarm</span> <span class="o">=</span> <span class="n">FixExternalHarmonic</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;Uharm&#39;</span><span class="p">,</span><span class="n">groupHandle</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span>
+  <span class="n">k</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.5</span><span class="p">),</span> <span class="n">r0</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">))</span>
+<span class="c">#Activate fix</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">UextHarmt</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">External Harmonic Potential Fix</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#constructor">Constructor</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fix-wall-harmonic.html"
+                        title="previous chapter">Harmonic Wall Potential</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fix-external-quartic.html"
+                        title="next chapter">External Quartic Potential Fix</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/fix-external-harmonic.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="fix-external-quartic.html" title="External Quartic Potential Fix"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fix-wall-harmonic.html" title="Harmonic Wall Potential"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

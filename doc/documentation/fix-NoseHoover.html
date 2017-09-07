@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Nose-Hoover Thermostat and Barostat &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="Berendsen Barostat" href="fix-pressure-Berendsen.html" />
+    <link rel="prev" title="Springs" href="springs.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fix-pressure-Berendsen.html" title="Berendsen Barostat"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="springs.html" title="Springs"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="nose-hoover-thermostat-and-barostat">
+<h1>Nose-Hoover Thermostat and Barostat<a class="headerlink" href="#nose-hoover-thermostat-and-barostat" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Implements Nose-Hoover dynamics using the equations of motion as outlined in Tuckerman et. al, J. Phys. A: Math. Gen 39 (2006) 5629-5651.  Allows for dynamics from the NVT or NPT ensembles to be simulated.  The total Liouville operator implemented for NPT dynamics is given by (from Tuckerman et. al 2006, p.5641):</p>
+<div class="math">
+\[iL = iL_1 + iL_2 + iL_{\epsilon,1} + iL_{\epsilon,2} + iL_{T-baro} + iL_{T-Part}\]\[iL_1 = \sum\limits_{i=1}^N \bigl[\frac{\mathbf{p}_i}{m_i} + \frac{p_{\epsilon}}{W} \mathbf{r}_i \bigl] \cdot \frac{\partial}{\partial \mathbf{r}_i}\]\[iL_2 = \sum\limits_{i=1}^N \bigl[\mathbf{F}_i - \alpha \frac{p_{\epsilon}}{W}\mathbf{p}_i \bigl] \cdot \frac{\partial}{\partial \mathbf{p}_i}\]\[iL_{\epsilon,1} = \frac{p_{\epsilon}}{W} \frac{\partial}{\partial \epsilon}\]\[iL_{\epsilon,2} = G_{\epsilon} \frac{\partial}{\partial p_{\epsilon}}\]\[\text{where } G_{\epsilon} = \alpha \sum\limits_i \frac{\mathbf{p}_i^2}{m_i} +
+\sum\limits_{i=1}^N \mathbf{r}_i \cdot \mathbf{F}_i - 3 V \frac{\partial U}{\partial V} - PV\]</div>
+<p>Here, <span class="math">\(\mathbf{p}_i\)</span> and <span class="math">\(\mathbf{r}_i\)</span> are the particle momenta and positions, <span class="math">\(\mathbf{F}_i\)</span> are the forces on the particles, <span class="math">\(p_{\epsilon}\)</span> and <span class="math">\(W\)</span> are the barostat momenta and masses, <span class="math">\(\alpha\)</span> is a factor of <span class="math">\(1+\frac{1}{N}\)</span>, and <span class="math">\(P\)</span> and <span class="math">\(V\)</span> are the set point pressure and instantaneous volume, respectively.</p>
+<p>The corresponding propagator for the NPT ensemble is then given by:</p>
+<div class="math">
+\[\begin{split}\exp(iL \Delta t) = \exp (iL_{T-baro} \frac{\Delta t}{2}) \exp (iL_{T-part} \frac{\Delta t}{2}) \exp (iL_{\epsilon,2} \frac{\Delta t}{2}) \\
+\times \exp (iL_2 \frac{\Delta t}{2}) \exp (iL_{\epsilon,1} \Delta t) \exp(iL_1 \Delta t) \exp(iL_2 \frac{\Delta t}{2}) \\
+\times \exp(iL_{\epsilon,2} \frac{\Delta t}{2}) \exp(iL_{T-part} \frac{\Delta t}{2}) \exp(iL_{T-baro} \frac{\Delta t}{2})\end{split}\]</div>
+<p>The barostat variables and particles are separately thermostatted; in each case, a chain of 3 thermostats is used.  Integration is accomplished via a first order Suzuki-Yoshida integration scheme.</p>
+</div>
+<div class="section" id="constructor">
+<h2>Constructor<a class="headerlink" href="#constructor" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">FixNoseHoover</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="n">handle</span><span class="p">,</span><span class="n">groupHandle</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">state</span></tt></dt>
+<dd>The simulation state to which the fix is applied.</dd>
+<dt><tt class="docutils literal"><span class="pre">handle</span></tt></dt>
+<dd>The name of the fix.  String type.</dd>
+<dt><tt class="docutils literal"><span class="pre">groupHandle</span></tt></dt>
+<dd>The group of atoms to which this fix is to be applied.  String type.</dd>
+</dl>
+</div>
+<div class="section" id="python-member-functions">
+<h2>Python Member Functions<a class="headerlink" href="#python-member-functions" title="Permalink to this headline">¶</a></h2>
+<p>The Nose-Hoover Barostat/Thermostat set points are set via the Python member functions.</p>
+<p>Temperature set points may be input through any of the following commands:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">setTemperature</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span><span class="n">timeConstant</span><span class="p">)</span>
+<span class="n">setTemperature</span><span class="p">(</span><span class="n">temps</span><span class="p">,</span><span class="n">intervals</span><span class="p">,</span><span class="n">timeConstant</span><span class="p">)</span>
+<span class="n">setTemperature</span><span class="p">(</span><span class="n">tempFunc</span><span class="p">,</span> <span class="n">timeConstant</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The first method holds the temperature of <tt class="docutils literal"><span class="pre">groupHandle</span></tt> at a set point of <tt class="docutils literal"><span class="pre">temp</span></tt>.  The second linearly interpolates between the temperatures given in the list <tt class="docutils literal"><span class="pre">temps</span></tt> at the fractions through the current run given by <tt class="docutils literal"><span class="pre">intervals</span></tt>.  The third allows the set point to be determined at each turn via <tt class="docutils literal"><span class="pre">tempFunc</span></tt>.  The same scheme is used to set pressure.</p>
+<p>Arguments:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">temp</span></tt></dt>
+<dd>The temperature set point for the simulation.  Float type.</dd>
+<dt><tt class="docutils literal"><span class="pre">timeConstant</span></tt></dt>
+<dd>The time constant associated with the thermostat variables.  Float type.</dd>
+<dt><tt class="docutils literal"><span class="pre">temps</span></tt></dt>
+<dd>A list of temperature set points to be used throughout the simulation.  List of floats.</dd>
+<dt><tt class="docutils literal"><span class="pre">intervals</span></tt></dt>
+<dd>A list of fractions through the next run which correspond to the temperatures given in <tt class="docutils literal"><span class="pre">temps</span></tt>. List of floats.</dd>
+<dt><tt class="docutils literal"><span class="pre">tempFunc</span></tt></dt>
+<dd>The temperature set point, implemented as a python function.</dd>
+</dl>
+<p>Likewise, specification of a set point pressure may be accomplished through any of the following commands:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">setPressure</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span><span class="n">pressure</span><span class="p">,</span><span class="n">timeConstant</span><span class="p">)</span>
+<span class="n">setPressure</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span><span class="n">pressures</span><span class="p">,</span><span class="n">intervals</span><span class="p">,</span><span class="n">timeConstant</span><span class="p">)</span>
+<span class="n">setPressure</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span><span class="n">pressFunc</span><span class="p">,</span><span class="n">timeConstant</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Arguments:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">mode</span></tt></dt>
+<dd>The mode in which cell deformations occur; options are &#8220;ISO&#8221; or &#8220;ANISO&#8221;.  With mode &#8220;ISO&#8221;, the internal stress tensor is averaged across the three normal components (or 2, for 2D simulations), and a uniform scale factor for the dimensions emerges.  For &#8220;ANISO&#8221;, the components of the internal stress tensor are not averaged and the individual dimensions are scaled independently.</dd>
+<dt><tt class="docutils literal"><span class="pre">pressure</span></tt></dt>
+<dd>The set point pressure for the simulation.  Float type.</dd>
+<dt><tt class="docutils literal"><span class="pre">timeConstant</span></tt></dt>
+<dd>The time constant associated with the barostat variables.  Float type.</dd>
+<dt><tt class="docutils literal"><span class="pre">pressures</span></tt></dt>
+<dd>A list of pressure set points to be used through the simulation.  List of floats.</dd>
+<dt><tt class="docutils literal"><span class="pre">intervals</span></tt></dt>
+<dd>A list of fractions through the next run which correspond to the pressures given in <tt class="docutils literal"><span class="pre">pressures</span></tt>. List of floats.</dd>
+<dt><tt class="docutils literal"><span class="pre">pressFunc</span></tt></dt>
+<dd>The pressure set point, implemented as a python function.</dd>
+</dl>
+<p>For NPT dynamics, both <tt class="docutils literal"><span class="pre">setTemperature</span></tt> and <tt class="docutils literal"><span class="pre">setPressure</span></tt> should be called.  They can be called in any order before the simulation is run.</p>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Example 1: Nose-Hoover Thermostat (NVT Ensemble) - constant set point temperature</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># create a simulation state</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">State</span><span class="p">()</span>
+
+<span class="c"># make an instance of the fix</span>
+<span class="n">fixNVT</span> <span class="o">=</span> <span class="n">FixNoseHoover</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&quot;nvt&quot;</span><span class="p">,</span> <span class="s">&quot;all&quot;</span><span class="p">)</span>
+
+<span class="c"># assign a set point temperature of 300K with time constant 100*state.dt</span>
+<span class="n">fixNVT</span><span class="o">.</span><span class="n">setTemperature</span><span class="p">(</span><span class="mf">300.0</span><span class="p">,</span> <span class="mi">100</span><span class="o">*</span><span class="n">state</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+
+<span class="c"># activate the fix</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">fixNVT</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Example 2: Nose-Hoover Barostat &amp; Thermostat (NPT Ensemble) - constant set point temperature &amp; pressure</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># create a simulation state</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">State</span><span class="p">()</span>
+
+<span class="c"># make an instance of the fix</span>
+<span class="n">fixNPT</span> <span class="o">=</span> <span class="n">FixNoseHoover</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&quot;npt&quot;</span><span class="p">,</span> <span class="s">&quot;all&quot;</span><span class="p">)</span>
+
+<span class="c"># assign a set point temperature and time constant 100*state.dt</span>
+<span class="n">fixNPT</span><span class="o">.</span><span class="n">setTemperature</span><span class="p">(</span><span class="mf">250.0</span><span class="p">,</span> <span class="mi">100</span><span class="o">*</span><span class="n">state</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+
+<span class="c"># assign a set point pressure and time constant 1000*state.dt with isotropic cell deformations</span>
+<span class="n">fixNPT</span><span class="o">.</span><span class="n">setPressure</span><span class="p">(</span><span class="s">&quot;ISO&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">1000</span><span class="o">*</span><span class="n">state</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+
+<span class="c"># activate the fix</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">fixNPT</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Example 3: Setting temperature via <tt class="docutils literal"><span class="pre">temperature</span></tt> and <tt class="docutils literal"><span class="pre">intervals</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># create a simulation state</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">State</span><span class="p">()</span>
+
+<span class="c"># make an instance of the fix</span>
+<span class="n">fixNVT</span> <span class="o">=</span> <span class="n">FixNoseHoover</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&quot;nvt&quot;</span><span class="p">,</span> <span class="s">&quot;all&quot;</span><span class="p">)</span>
+
+<span class="c"># assign a set point temperature of 300K with time constant 100*state.dt</span>
+<span class="n">fixNVT</span><span class="o">.</span><span class="n">setTemperature</span><span class="p">(</span><span class="n">temps</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">400</span><span class="p">],</span> <span class="n">intervals</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="mi">100</span><span class="o">*</span><span class="n">state</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+
+<span class="c"># activate the fix</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">fixNVT</span><span class="p">)</span>
+
+<span class="n">integrator</span> <span class="o">=</span> <span class="n">IntegratorVerlet</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+<span class="c">#Will sweep from temp=100 to temp=500 between turns 0 and 2000, then 500 and 400 between turns 2000 and 10000</span>
+<span class="n">integrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Example 4: Setting temperature via <tt class="docutils literal"><span class="pre">tempFunc</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">randomTemp</span><span class="p">(</span><span class="n">turnRunBegan</span><span class="p">,</span> <span class="n">turnRunEnds</span><span class="p">,</span> <span class="n">currentTurn</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">100</span> <span class="o">+</span> <span class="mi">50</span><span class="o">*</span><span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">currentTurn</span><span class="o">-</span><span class="n">turnRunBegan</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">turnRunEnds</span><span class="o">-</span><span class="n">turnRunBegan</span><span class="p">)</span>
+
+<span class="c"># create a simulation state</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">State</span><span class="p">()</span>
+
+<span class="c"># make an instance of the fix</span>
+<span class="n">fixNVT</span> <span class="o">=</span> <span class="n">FixNoseHoover</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&quot;nvt&quot;</span><span class="p">,</span> <span class="s">&quot;all&quot;</span><span class="p">)</span>
+
+<span class="c"># assign a set point temperature of 300K with time constant 100*state.dt</span>
+<span class="n">fixNVT</span><span class="o">.</span><span class="n">setTemperature</span><span class="p">(</span><span class="n">tempFunc</span><span class="o">=</span><span class="n">randomTemp</span><span class="p">,</span> <span class="mi">100</span><span class="o">*</span><span class="n">state</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+
+<span class="c"># activate the fix</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">fixNVT</span><span class="p">)</span>
+
+<span class="n">integrator</span> <span class="o">=</span> <span class="n">IntegratorVerlet</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+<span class="c">#Will use the value returned by randomTemp each turn as the setpoint</span>
+<span class="n">integrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Nose-Hoover Thermostat and Barostat</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#constructor">Constructor</a></li>
+<li><a class="reference internal" href="#python-member-functions">Python Member Functions</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="springs.html"
+                        title="previous chapter">Springs</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fix-pressure-Berendsen.html"
+                        title="next chapter">Berendsen Barostat</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/fix-NoseHoover.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="fix-pressure-Berendsen.html" title="Berendsen Barostat"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="springs.html" title="Springs"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

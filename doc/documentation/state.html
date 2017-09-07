@@ -1,0 +1,328 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Simulation State &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="Recording Data" href="data-recording.html" />
+    <link rel="prev" title="Welcome to DASH’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="data-recording.html" title="Recording Data"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to DASH’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="simulation-state">
+<h1>Simulation State<a class="headerlink" href="#simulation-state" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">State</span></tt> class holds all data pertaining to a given simulation.  This includes atoms, connectivity information, simulation box size, thermodynamic information, recorded data, and more.  <tt class="docutils literal"><span class="pre">State</span></tt> has many member variables and functions which help you to prepare your simulation for running.</p>
+</div>
+<div class="section" id="basic-usage">
+<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
+<p>The following is an example which shows basic preparation of the simulation state with detailed explanation of each command</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Initializing the simulation state variable</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">State</span><span class="p">()</span>
+
+<span class="c">#Set simulation box</span>
+<span class="c">#Vector is a DASH-specific class which allows for easy vector math</span>
+<span class="n">state</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">Bounds</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">lo</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">hi</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+
+<span class="c">#The box can be changed at any time</span>
+<span class="n">state</span><span class="o">.</span><span class="n">bounds</span><span class="o">.</span><span class="n">lo</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c">#Now add a new atom type - atomParams stores atom type information</span>
+<span class="n">state</span><span class="o">.</span><span class="n">atomParams</span><span class="o">.</span><span class="n">addSpecies</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;species1&#39;</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c">#Now we create a fix to apply Lennard-Jones forces</span>
+<span class="c">#the fix gets a handle (name), which is useful for restarting simulations</span>
+<span class="n">nonbond</span> <span class="o">=</span> <span class="n">FixLJCut</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="s">&#39;myLJCut&#39;</span><span class="p">)</span>
+
+<span class="c">#sets species1-species1 sigma and epsilon to 0.5 and 2, respectively</span>
+<span class="n">nonbond</span><span class="o">.</span><span class="n">setParameter</span><span class="p">(</span><span class="s">&#39;sig&#39;</span><span class="p">,</span> <span class="s">&#39;species1&#39;</span><span class="p">,</span> <span class="s">&#39;species1&#39;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="n">nonbond</span><span class="o">.</span><span class="n">setParameter</span><span class="p">(</span><span class="s">&#39;eps&#39;</span><span class="p">,</span> <span class="s">&#39;species1&#39;</span><span class="p">,</span> <span class="s">&#39;species1&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="c">#turn on the fix</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">nonbond</span><span class="p">)</span>
+
+<span class="c">#create some atoms on a lattice</span>
+<span class="n">lo</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">bounds</span><span class="o">.</span><span class="n">lo</span>
+<span class="n">hi</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">bounds</span><span class="o">.</span><span class="n">hi</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lo</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">hi</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lo</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">hi</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lo</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">hi</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">addAtom</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;species1&#39;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+
+<span class="c">#give the atoms a temperature</span>
+<span class="n">InitializeAtoms</span><span class="o">.</span><span class="n">initTemp</span><span class="p">(</span><span class="n">groupHandle</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="c">#create a Nose-Hoover thermostat</span>
+<span class="c">#other</span>
+<span class="n">fixNVT</span> <span class="o">=</span> <span class="n">FixNoseHoover</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="s">&#39;myThermostat&#39;</span><span class="p">,</span> <span class="n">groupHandle</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">timeConstant</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="c">#then activate it like other fixes</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">fixNVT</span><span class="p">)</span>
+
+<span class="c">#create an integrator - this is a standard langevin integrator,</span>
+<span class="c">#though other options are available.</span>
+
+<span class="n">integrator</span> <span class="o">=</span> <span class="n">IntegratorVerlet</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+<span class="c">#set the timestep</span>
+<span class="n">state</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="mf">0.005</span>
+<span class="c">#run for 10000 turns</span>
+<span class="n">integrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="python-member-functions">
+<h2>Python Member Functions<a class="headerlink" href="#python-member-functions" title="Permalink to this headline">¶</a></h2>
+<p><strong>Adding and removing atoms</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">state</span><span class="o">.</span><span class="n">addAtom</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;...&#39;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="o">...</span><span class="p">),</span> <span class="n">q</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">handle</span></tt></dt>
+<dd>Species handle</dd>
+<dt><tt class="docutils literal"><span class="pre">pos</span></tt></dt>
+<dd>Position of atom</dd>
+<dt><tt class="docutils literal"><span class="pre">q</span></tt></dt>
+<dd>Charge of atom</dd>
+</dl>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">anAtom</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+<span class="c">#deletes all bonds, dihedrals, etc as well</span>
+<span class="n">state</span><span class="o">.</span><span class="n">deleteAtom</span><span class="p">(</span><span class="n">anAtom</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="Atoms.html"><em>Atoms</em></a> also provides tools for initializing groups of atoms.</p>
+</div>
+<div class="section" id="python-members">
+<h2>Python members<a class="headerlink" href="#python-members" title="Permalink to this headline">¶</a></h2>
+<p><strong>Current turn</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">turn</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">turn</span>
+<span class="c">#reset current turn to 0</span>
+<span class="n">state</span><span class="o">.</span><span class="n">turn</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p><strong>Simulation timestep</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#Setting simulation timestep</span>
+<span class="c">#This will be in femptoseconds or LJ time units</span>
+<span class="c">#depending on the current units</span>
+<span class="n">state</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<p><strong>Cutoff radius</strong></p>
+<blockquote>
+<div>Cutoff distance for non-bonded forces, except for charge forces which have their cutoff specially set</div></blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">state</span><span class="o">.</span><span class="n">rCut</span> <span class="o">=</span> <span class="mf">10.0</span>
+</pre></div>
+</div>
+<p><strong>Neighborlist padding</strong></p>
+<blockquote>
+<div>Distant past <tt class="docutils literal"><span class="pre">rCut</span></tt> for which neighborlists are built.  This parameter can be manipulated to optimize performance.  Suggested values are <tt class="docutils literal"><span class="pre">0.5</span></tt> in Lennard-Jones units and <tt class="docutils literal"><span class="pre">2.0</span></tt> Angstroms in real units</div></blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">state</span><span class="o">.</span><span class="n">padding</span> <span class="o">=</span> <span class="mf">2.0</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="groups-and-molecules">
+<h2>Groups and Molecules<a class="headerlink" href="#groups-and-molecules" title="Permalink to this headline">¶</a></h2>
+<p><strong>Creating groups of atoms</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">state</span><span class="o">.</span><span class="n">createGroup</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;...&#39;</span> <span class="n">atoms</span><span class="o">=</span><span class="p">[</span><span class="o">...</span><span class="p">])</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">handle</span></tt></dt>
+<dd>Name of group</dd>
+<dt><tt class="docutils literal"><span class="pre">atoms</span></tt></dt>
+<dd>List of atom ids to be in group.  Optional argument</dd>
+</dl>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">state</span><span class="o">.</span><span class="n">addToGroup</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;...&#39;</span> <span class="n">atoms</span><span class="o">=</span><span class="p">[</span><span class="o">...</span><span class="p">])</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">handle</span></tt></dt>
+<dd>Name of group</dd>
+<dt><tt class="docutils literal"><span class="pre">atoms</span></tt></dt>
+<dd>List of atom ids to be in group.  Optional argument</dd>
+</dl>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">state</span><span class="o">.</span><span class="n">deleteGroup</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;...&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">handle</span></tt></dt>
+<dd>Name of group to delete</dd>
+</dl>
+<p>One can easily select all atoms in a group as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">atomsInGroup</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">atoms</span> <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">atomInGroup</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s">&#39;myGroup&#39;</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p><strong>Creating molecules</strong></p>
+<p>See <a class="reference internal" href="molecule.html"><em>Molecules</em></a>.</p>
+<p><strong>Setting special neighbor coefficients</strong></p>
+<p>Most force fields scale down forces for atoms which are topologically nearby.  The 1-2, 1-3, and 1-4 neighbor coefficients can be set as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#1-2, 1-3, 1-4 neighbor coefficients</span>
+<span class="n">state</span><span class="o">.</span><span class="n">setSpecialNeighborCoefs</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><em>Note</em>: When using the :doc:&#8217;CHARMM&lt;/ljcharmm&gt;&#8217; potential, the 1-4 coefficient must be different than 1-2 and 1-3.</p>
+</div>
+<div class="section" id="managing-fixes-configuration-writers-and-python-operations">
+<h2>Managing fixes, configuration writers, and python operations<a class="headerlink" href="#managing-fixes-configuration-writers-and-python-operations" title="Permalink to this headline">¶</a></h2>
+<p><strong>Activating fixes</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#turns on the fix</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">myFix</span><span class="p">)</span>
+
+<span class="c">#turns off the fix</span>
+<span class="n">state</span><span class="o">.</span><span class="n">deactivateFix</span><span class="p">(</span><span class="n">myFix</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Activating configuration writers</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#turns on the writer</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateWriteConfig</span><span class="p">(</span><span class="n">myWriter</span><span class="p">)</span>
+
+<span class="c">#turns off the writer</span>
+<span class="n">state</span><span class="o">.</span><span class="n">deactivateWriteConfig</span><span class="p">(</span><span class="n">myWriter</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Activating python operations</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#turns on the python operation</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activatePythonOperation</span><span class="p">(</span><span class="n">myOp</span><span class="p">)</span>
+
+<span class="c">#turns off the writer</span>
+<span class="n">state</span><span class="o">.</span><span class="n">deactivatePythonOperation</span><span class="p">(</span><span class="n">myOp</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Converting particle id to index</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">currentIdx</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">idToIdx</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+<span class="n">atom</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">currentIdx</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>Setting periodicity</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#0, 1, 2 -&gt; x, y, z</span>
+<span class="n">state</span><span class="o">.</span><span class="n">setPeriodic</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+<span class="n">isPeriodicZ</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getPeriodic</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="selecting-gpus">
+<h2>Selecting GPUs<a class="headerlink" href="#selecting-gpus" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>At runtime, you can set which GPU to run on using</div></blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#set DASH to run on GPU index 0</span>
+<span class="n">state</span><span class="o">.</span><span class="n">deviceManager</span><span class="o">.</span><span class="n">setDevice</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c">#set DASH to run on GPU index 1</span>
+<span class="n">state</span><span class="o">.</span><span class="n">deviceManager</span><span class="o">.</span><span class="n">setDevice</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>By default it will select device index nDevices-1.  You can query the indeces of your devices by running <tt class="docutils literal"><span class="pre">nvidia-smi</span></tt> in the terminal.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Simulation State</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
+<li><a class="reference internal" href="#python-member-functions">Python Member Functions</a></li>
+<li><a class="reference internal" href="#python-members">Python members</a></li>
+<li><a class="reference internal" href="#groups-and-molecules">Groups and Molecules</a></li>
+<li><a class="reference internal" href="#managing-fixes-configuration-writers-and-python-operations">Managing fixes, configuration writers, and python operations</a></li>
+<li><a class="reference internal" href="#selecting-gpus">Selecting GPUs</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to DASH&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="data-recording.html"
+                        title="next chapter">Recording Data</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/state.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="data-recording.html" title="Recording Data"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to DASH’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

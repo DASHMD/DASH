@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Getting Starting &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="Simulation State" href="state.html" />
+    <link rel="prev" title="Compiling DASH" href="compiling.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="state.html" title="Simulation State"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="compiling.html" title="Compiling DASH"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="getting-starting">
+<h1>Getting Starting<a class="headerlink" href="#getting-starting" title="Permalink to this headline">¶</a></h1>
+<p>Here we give a simple DASH script to get things started.</p>
+<p>This script simply creates two atoms which interact via a Lennard-Jones potential.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sys.path</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;/the/path/to/DASH.so/&#39;</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">DASH</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="c">#initialize simulation state</span>
+<span class="c">#Lennard-Jones units are the default</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">State</span><span class="p">()</span>
+
+<span class="c">#Now we create an atom type</span>
+<span class="n">state</span><span class="o">.</span><span class="n">atomParams</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;spc1&#39;</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c">#initialize system bounds</span>
+<span class="n">state</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">Bounds</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">lo</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">hi</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+
+<span class="c">#set cutoff radius</span>
+<span class="n">state</span><span class="o">.</span><span class="n">rCut</span> <span class="o">=</span> <span class="mf">2.5</span>
+<span class="c">#set neighborlist padding</span>
+<span class="n">state</span><span class="o">.</span><span class="n">padding</span> <span class="o">=</span> <span class="mf">0.5</span>
+
+<span class="c">#add two atoms</span>
+<span class="n">state</span><span class="o">.</span><span class="n">addAtom</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;spc1&#39;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">state</span><span class="o">.</span><span class="n">addAtom</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="s">&#39;spc1&#39;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="c">#Their properties can be accessed from within the python script</span>
+<span class="k">print</span> <span class="n">state</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span>
+<span class="c">#prints out (3, 1, 1)</span>
+
+<span class="c">#Set the velocity of an atom</span>
+<span class="n">state</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vel</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+
+<span class="c">#Initialize Lennard-Jones parameters</span>
+<span class="n">nonbond</span> <span class="o">=</span> <span class="n">FixLJCut</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&#39;cut&#39;</span><span class="p">)</span>
+<span class="c">#set sigma and epsilon</span>
+<span class="n">nonbond</span><span class="o">.</span><span class="n">setParameter</span><span class="p">(</span><span class="s">&#39;sig&#39;</span><span class="p">,</span> <span class="s">&#39;spc1&#39;</span><span class="p">,</span> <span class="s">&#39;spc1&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">nonbond</span><span class="o">.</span><span class="n">setParameter</span><span class="p">(</span><span class="s">&#39;eps&#39;</span><span class="p">,</span> <span class="s">&#39;spc1&#39;</span><span class="p">,</span> <span class="s">&#39;spc1&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="c">#turn on fix</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">nonbond</span><span class="p">)</span>
+
+<span class="c">#create an integrator.</span>
+<span class="n">integrator</span> <span class="o">=</span> <span class="n">IntegratorVerlet</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="c">#run the simulation</span>
+<span class="n">integrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+
+<span class="k">print</span> <span class="n">state</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span>
+</pre></div>
+</div>
+<p>We could bond the atoms together as well.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">bondHarmonic</span> <span class="o">=</span> <span class="n">FixBondHarmonic</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="s">&#39;bond&#39;</span><span class="p">)</span>
+<span class="n">bondHarmonic</span><span class="o">.</span><span class="n">createBond</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">state</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">r0</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">bondHarmonic</span><span class="p">)</span>
+<span class="n">integrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>These examples show the basics of how one can interact with DASH through Python.  For more information on functionality and interface, see the remainder of the documentation.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="compiling.html"
+                        title="previous chapter">Compiling DASH</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="state.html"
+                        title="next chapter">Simulation State</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/getting-started.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="state.html" title="Simulation State"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="compiling.html" title="Compiling DASH"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

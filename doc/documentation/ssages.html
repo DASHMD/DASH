@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Coupling with SSAGES &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="prev" title="LAMMPS reader" href="lammps-reader.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="lammps-reader.html" title="LAMMPS reader"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="coupling-with-ssages">
+<h1>Coupling with SSAGES<a class="headerlink" href="#coupling-with-ssages" title="Permalink to this headline">¶</a></h1>
+<p>DASH was contructed to efficiently couple to the advanced sampling engine SSAGES.  This allows for advanced sampling methods such as Basis Function sampling, Adaptive Bias Force sampling, Green&#8217;s function sampling, umbrella sampling, and more to be performed at GPU speeds with minimal overhead.</p>
+<p>First, SSAGES must be compiled with DASH.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nb">cd </span>path/to/ssages/directory
+mkdir build
+<span class="nb">cd </span>build
+cmake .. -DDASH_SRC<span class="o">=</span>/path/to/dash
+make
+</pre></div>
+</div>
+<p>We also need to compile dash on its own in order to generate the python library</p>
+<p>Once both DASH and SSAGES are compiled, ensure that <tt class="docutils literal"><span class="pre">libSim.so</span></tt> is in your LD_LIBRARY_PATH environment variable, and you&#8217;re ready to go.</p>
+<p>SSAGES looks for two functions within your DASH python script - a <tt class="docutils literal"><span class="pre">setupSimulation</span></tt> function which initializes the <a class="reference internal" href="state.html"><em>simulation state</em></a> and a <tt class="docutils literal"><span class="pre">runSimulation</span></tt> function which takes as an argument a number of timesteps, and must run the simulation for that long.</p>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#import DASH as normal</span>
+
+<span class="k">def</span> <span class="nf">setupSimulation</span><span class="p">():</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">State</span><span class="p">()</span>
+    <span class="c">#create fixes, add atoms, prepare simulation state</span>
+
+
+    <span class="c">#function must return the simulation state</span>
+    <span class="k">return</span> <span class="n">state</span>
+
+<span class="c">#SSAGES calls this function using the state you returned in setupSimulation</span>
+<span class="c">#SSAGES has internally appended a special fix which applies</span>
+<span class="c">#operations required for you advanced sampling technique</span>
+<span class="k">def</span> <span class="nf">runSimulation</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">numTurns</span><span class="p">):</span>
+    <span class="n">integ</span> <span class="o">=</span> <span class="n">IntegratorVerlet</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+    <span class="n">nvt</span> <span class="o">=</span> <span class="n">FixNoseHoover</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="s">&#39;myThermo&#39;</span><span class="p">,</span> <span class="n">groupHandle</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">timeConstant</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">state</span><span class="o">.</span><span class="n">activateFix</span><span class="p">(</span><span class="n">nvt</span><span class="p">)</span>
+    <span class="n">integ</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">numTurns</span><span class="p">)</span>
+    <span class="n">state</span><span class="o">.</span><span class="n">deactivateFix</span><span class="p">(</span><span class="n">nvt</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Coupling with SSAGES</a><ul>
+<li><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="lammps-reader.html"
+                        title="previous chapter">LAMMPS reader</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/ssages.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="lammps-reader.html" title="LAMMPS reader"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

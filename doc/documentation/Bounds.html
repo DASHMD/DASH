@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Bounds &mdash; Dash 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Dash 0.5 documentation" href="index.html" />
+    <link rel="next" title="Units" href="Units.html" />
+    <link rel="prev" title="Atoms" href="Atoms.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Units.html" title="Units"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Atoms.html" title="Atoms"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="bounds">
+<h1>Bounds<a class="headerlink" href="#bounds" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Bounds</span></tt> objects are used to define volumes in space.  The <tt class="docutils literal"><span class="pre">state</span></tt> must have a <tt class="docutils literal"><span class="pre">bounds</span></tt> property specifying the simulation volume; smaller sections of this total volume can be used to perform various functions, such as populating certain regions in space with atoms.</p>
+</div>
+<div class="section" id="creating-and-modifying-bounds">
+<h2>Creating and Modifying Bounds<a class="headerlink" href="#creating-and-modifying-bounds" title="Permalink to this headline">¶</a></h2>
+<p><strong>Class Bounds(</strong> state, lo, high <strong>)</strong></p>
+<p><tt class="docutils literal"><span class="pre">state</span></tt>: The simulation state.</p>
+<p><tt class="docutils literal"><span class="pre">lo</span></tt>: A Vector object indicating the lower bounds in the x,y, and z directions.</p>
+<p><tt class="docutils literal"><span class="pre">high</span></tt>: A Vector object indicating the upper bounds in the x,y, and z directions.</p>
+<p><strong>Attributes</strong></p>
+<p>The following attributes and methods of the <tt class="docutils literal"><span class="pre">Bounds</span></tt> object are available:</p>
+<p><tt class="docutils literal"><span class="pre">lo</span></tt>: A Vector object indicating the lower bounds in the x,y, and z directions (read/write).</p>
+<p><tt class="docutils literal"><span class="pre">high</span></tt>: A Vector object indicating the upper bounds in the x,y, and z directions (read/write).</p>
+<p><tt class="docutils literal"><span class="pre">volume</span></tt>: The volume of the space enclosed by the <tt class="docutils literal"><span class="pre">Bounds</span></tt> (read-only).</p>
+<div class="section" id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
+<p><strong>bounds.copy()</strong></p>
+<p>This method returns a copy of the <tt class="docutils literal"><span class="pre">Bounds</span></tt> object on which it is invoked.</p>
+<p><strong>bounds.vectorInBounds(</strong> Vector v <strong>)</strong></p>
+<p>This method returns <tt class="docutils literal"><span class="pre">True</span></tt> if the argument Vector object <tt class="docutils literal"><span class="pre">v</span></tt> describes a position within the bounds.</p>
+<p><strong>bounds.atomInBounds(</strong> Atom a <strong>)</strong></p>
+<p>This method returns <tt class="docutils literal"><span class="pre">True</span></tt> if the position of atom <tt class="docutils literal"><span class="pre">a</span></tt> is within the bounds.</p>
+<p><strong>bounds.minImage(</strong> Vector v <strong>)</strong></p>
+<p>This method returns a Vector containing the periodic image of the position described by the input Vector <tt class="docutils literal"><span class="pre">v</span></tt>.</p>
+<p><strong>Example</strong></p>
+<p>The following example illustrates the syntax used to initiaize a simulation box.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#set the bounds for a 5x5x5 box</span>
+<span class="n">state</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">Bounds</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">lo</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">hi</span><span class="o">=</span><span class="n">Vector</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c">#get the volume of our box</span>
+<span class="n">volume</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">bounds</span><span class="o">.</span><span class="n">volume</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Bounds</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#creating-and-modifying-bounds">Creating and Modifying Bounds</a><ul>
+<li><a class="reference internal" href="#methods">Methods</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Atoms.html"
+                        title="previous chapter">Atoms</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Units.html"
+                        title="next chapter">Units</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/Bounds.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Units.html" title="Units"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Atoms.html" title="Atoms"
+             >previous</a> |</li>
+        <li><a href="index.html">Dash 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, Daniel Reid, Michael Webb, Brian Keene, Phillip Rauscher, Marat Andreev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

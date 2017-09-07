@@ -1,0 +1,15 @@
+#Non-bonded interactions (pair-wise) 
+pair_coeff 1 1 0.0 1.0
+pair_coeff 1 2 0.0 1.0
+pair_coeff 1 3 0.0 0.75
+pair_coeff 2 2 0.3 1.0
+pair_coeff 2 3 0.547723 0.75
+pair_coeff 3 3 1.0 0.5
+
+#FENE Stretching Interactions 
+#bond_coeff bondtype k R0 epsilon sigma
+bond_coeff 1 30.0 1.5 1.0 1.0
+
+
+#Harmonic Angle Interaction 
+angle_coeff 1 1.0 180.0
