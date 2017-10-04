@@ -10,7 +10,8 @@ class EvaluatorDipolarCoupling {
             return make_float3(0, 0, 0);
         }
         inline __device__ float energy(float params[1], float lenSqr, float multiplier) {
-            return 1.0f / powf(lenSqr, 1.5);
+            //need to compute 1/r^6 because we want D^2
+            return 1.0f / powf(lenSqr, 3);
         }
 
 };

@@ -39,7 +39,6 @@ inline __device__ void computeVirial(Virial &v, float3 force, float3 dr) {
     v[5] += force.y * dr.z;
 }
 
-
 template <class SRCVar, class SRCBase, class SRCFull, class DEST, class TYPEHOLDER, int N>
 int copyMultiAtomToGPU(int nAtoms, std::vector<SRCVar> &src, std::vector<int> &idToIdx, GPUArrayDeviceGlobal<DEST> *dest, GPUArrayDeviceGlobal<int> *destIdxs, std::unordered_map<int, TYPEHOLDER> *forcerTypes, GPUArrayDeviceGlobal<TYPEHOLDER> *parameters, int maxExistingType) {
     std::vector<int> idxs(nAtoms+1, 0); //started out being used as counts

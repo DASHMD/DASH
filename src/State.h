@@ -28,6 +28,7 @@
 #include "globalDefs.h"
 #include "GPUArrayTex.h"
 #include "GPUArrayGlobal.h"
+#include "GPUArrayDeviceGlobal.h"
 
 #include "AtomParams.h"
 #include "Atom.h"
@@ -37,6 +38,7 @@
 #include "GridGPU.h"
 #include "Bounds.h"
 #include "DataManager.h"
+#include "Group.h"
 
 #include "boost_for_export.h"
 #include "DeviceManager.h"
@@ -107,6 +109,9 @@ public:
                                                             //!< operations
     std::map<std::string, uint32_t> groupTags; //!< Map of group handles and
                                                //!< bitmasks
+    std::map<uint32_t,Group> groups; //!< Map of group handles to a given group
+    void populateGroupMap(); //!< Populates the data of our Group instances contained in the above map 'groups'
+
     bool is2d; //!< True for 2d simulations, else False
     bool periodic[3]; //!< If True, simulation is periodic in given dimension
     float dt; //!< Timestep
@@ -116,6 +121,7 @@ public:
     int64_t turn; //!< Step of the simulation
     int runningFor; //!< How long the simulation is currently running
     int nlistBuildCount; //!< number of times we have build nlists
+    std::vector<int> nlistBuildTurns; //!< turns at which we built the neighborlist
     int64_t runInit; //!< Timestep at which the current run started
     int64_t nextForceBuild; //!< Timestep neighborlists will definitely be build.  Fixes might need to request this
     int dangerousRebuilds; //!< Unused
@@ -336,6 +342,15 @@ public:
     int shoutEvery; //!< Report state of simulation every this many timesteps
     AtomParams atomParams; //!< Generic properties of the Atoms, e.g. masses,
                            //!< types, handles
+    void findRigidBodies(); //!< Gets all rigid bodies associated with this simulation state
+    bool rigidBodies; //!< Denotes whether rigid bodies are present in the simulation; 
+    std::vector<int> rigidAtoms; //!< Boolean array that informs barostats whether the barostat performs the position rescaling (evaluates to true), else false (constraint algorithm handles the NPT position scaling and translation).
+
+    GPUArrayGlobal<int> rigidBodiesMask;
+    //!< Boolean mask for NPT simulations (otherwise unused) with rigid bodies; GPU side of rigidAtoms array.  False for rigid bodies (Barostat does /not/ handle the position rescaling; rather, the constraint algorithm does), true otherwise.
+    // for now, let's keep this sorted by id?
+
+
 
     //! Return a copy of each Atom in the simulation
     /*!

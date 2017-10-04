@@ -114,19 +114,24 @@ bool FixBondQuartic::readFromRestart() {
                     std::string type_ = member_node.attribute("type").value();
                     std::string atom_a = member_node.attribute("atomID_a").value();
                     std::string atom_b = member_node.attribute("atomID_b").value();
+
+                    
                     std::string k2_ = member_node.attribute("k2").value();
                     std::string k3_ = member_node.attribute("k3").value();
                     std::string k4_ = member_node.attribute("k4").value();
                     std::string r0_ = member_node.attribute("r0").value();
+                    
                     type = atoi(type_.c_str());
                     ids[0] = atoi(atom_a.c_str());
                     ids[1] = atoi(atom_b.c_str());
                     Atom * a = &state->idToAtom(ids[0]);
                     Atom * b = &state->idToAtom(ids[1]);
+                    
                     k2 = atof(k2_.c_str());
                     k3 = atof(k3_.c_str());
                     k4 = atof(k4_.c_str());
                     r0 = atof(r0_.c_str());
+                    
 
                     createBond(a, b, k2,k3,k4, r0, type);
                 }

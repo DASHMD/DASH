@@ -5,6 +5,7 @@
 #include "Angle.h"
 #include "Vector.h"
 #include "helpers.h"
+#include "Fix.h"
 using namespace std;
 
 
@@ -86,27 +87,27 @@ __global__ void FDotR_cu(int nAtoms, float4 *xs, float4 *fs, Virial *virials) {
     }
 }
 
-__global__ void Mod::scaleSystem_cu(float4 *xs, int nAtoms, float3 lo, float3 rectLen, float3 scaleBy) {
+template <bool RIGIDBODIES>
+__global__ void Mod::scaleSystem_cu(float4 *xs, int nAtoms, float3 lo, float3 rectLen, float3 scaleBy,
+                                    int* idToIdxs, int* notRigidBody) {
     int idx = GETIDX();
     if (idx < nAtoms) {
-        float4 posWhole = xs[idx];
-        float3 pos = make_float3(posWhole);
-        float3 center = lo + rectLen * 0.5f;
-        float3 newRel = (pos - center) * scaleBy;
-        pos = center + newRel;
-        posWhole.x = pos.x;
-        posWhole.y = pos.y;
-        posWhole.z = pos.z;
-        xs[idx] = posWhole;
+        if (RIGIDBODIES) {
+            if (notRigidBody[idx]) {
+                int thisIdx = idToIdxs[idx];
+                float4 posWhole = xs[thisIdx];
+                float3 pos = make_float3(posWhole);
+                float3 center = lo + rectLen * 0.5f;
+                float3 newRel = (pos - center) * scaleBy;
+                pos = center + newRel;
+                posWhole.x = pos.x;
+                posWhole.y = pos.y;
+                posWhole.z = pos.z;
+                xs[thisIdx] = posWhole;
+            }
 
-    }
-}
-__global__ void Mod::scaleSystemGroup_cu(float4 *xs, int nAtoms, float3 lo, float3 rectLen, float3 scaleBy, uint32_t groupTag, float4 *fs) {
-    int idx = GETIDX();
-    if (idx < nAtoms) {
-        uint32_t tag = * (uint32_t *) &(fs[idx].w);
-        if (tag & groupTag) {
-            
+        } else {
+
             float4 posWhole = xs[idx];
             float3 pos = make_float3(posWhole);
             float3 center = lo + rectLen * 0.5f;
@@ -117,17 +118,78 @@ __global__ void Mod::scaleSystemGroup_cu(float4 *xs, int nAtoms, float3 lo, floa
             posWhole.z = pos.z;
             xs[idx] = posWhole;
         }
-
-
     }
 }
+
+// RIGIDBODIES is constant throughout a given simulation; so, scale system either by idToIdxs, or just by idx,
+// whichever is most convenient; since this doesnt change during a given run, it doesnt matter that we 
+// have two conventions by which this can proceed.
+template <bool RIGIDBODIES>
+__global__ void Mod::scaleSystemGroup_cu(float4 *xs, int nAtoms, float3 lo, float3 rectLen, float3 scaleBy, uint32_t groupTag, float4 *fs, int* idToIdxs, int* notRigidBody) {
+    int idx = GETIDX();
+    if (idx < nAtoms) {
+        if (RIGIDBODIES) {
+            // we need to check that it is not a rigid body, and that it is in the group being scaled
+            int newIdx = idToIdxs[idx];
+            uint32_t tag = * (uint32_t *) &(fs[newIdx].w);
+            if (tag & groupTag) {
+                // idx --> id; newIdx --> idx
+                if (notRigidBody[idx]) {
+            
+                    float4 posWhole = xs[newIdx];
+                    float3 pos = make_float3(posWhole);
+                    float3 center = lo + rectLen * 0.5f;
+                    float3 newRel = (pos - center) * scaleBy;
+                    pos = center + newRel;
+                    posWhole.x = pos.x;
+                    posWhole.y = pos.y;
+                    posWhole.z = pos.z;
+                    xs[newIdx] = posWhole;
+                }
+            } 
+        } else {
+            // keep it aligned by idx, and check the tag
+            uint32_t tag = * (uint32_t *) &(fs[idx].w);
+            if (tag & groupTag) {
+                float4 posWhole = xs[idx];
+                float3 pos = make_float3(posWhole);
+                float3 center = lo + rectLen * 0.5f;
+                float3 newRel = (pos - center) * scaleBy;
+                pos = center + newRel;
+                posWhole.x = pos.x;
+                posWhole.y = pos.y;
+                posWhole.z = pos.z;
+                xs[idx] = posWhole;
+
+
+            }
+        }
+    }
+}
+
 void Mod::scaleSystem(State *state, float3 scaleBy, uint32_t groupTag) {
     auto &gpd = state->gpd;
     state->boundsGPU.scale(scaleBy);
     if (groupTag==1) {
-        scaleSystem_cu<<<NBLOCK(state->atoms.size()), PERBLOCK>>>(gpd.xs.getDevData(), state->atoms.size(), state->boundsGPU.lo, state->boundsGPU.rectComponents, scaleBy);
+        if (state->rigidBodies) {
+
+            scaleSystem_cu<true><<<NBLOCK(state->atoms.size()), PERBLOCK>>>(gpd.xs.getDevData(), state->atoms.size(), state->boundsGPU.lo, state->boundsGPU.rectComponents, scaleBy, gpd.idToIdxs.d_data.data(),state->rigidBodiesMask.d_data.data());
+            for (Fix *f: state->fixes)  {
+                f->scaleRigidBodies(scaleBy,groupTag); 
+            }
+        } else {
+        scaleSystem_cu<false><<<NBLOCK(state->atoms.size()), PERBLOCK>>>(gpd.xs.getDevData(), state->atoms.size(), state->boundsGPU.lo, state->boundsGPU.rectComponents, scaleBy, gpd.idToIdxs.d_data.data(),state->rigidBodiesMask.d_data.data());
+        }
     } else if (groupTag) {
-        scaleSystemGroup_cu<<<NBLOCK(state->atoms.size()), PERBLOCK>>>(gpd.xs.getDevData(), state->atoms.size(), state->boundsGPU.lo, state->boundsGPU.rectComponents, scaleBy, groupTag, gpd.fs.getDevData());
+        if (state->rigidBodies) {
+            scaleSystemGroup_cu<true><<<NBLOCK(state->atoms.size()), PERBLOCK>>>(gpd.xs.getDevData(), state->atoms.size(), state->boundsGPU.lo, state->boundsGPU.rectComponents, scaleBy, groupTag, gpd.fs.getDevData(),gpd.idToIdxs.d_data.data(), state->rigidBodiesMask.d_data.data());
+            for (Fix *f: state->fixes)  {
+                f->scaleRigidBodies(scaleBy,groupTag); 
+            }
+            
+        } else {
+            scaleSystemGroup_cu<false><<<NBLOCK(state->atoms.size()), PERBLOCK>>>(gpd.xs.getDevData(), state->atoms.size(), state->boundsGPU.lo, state->boundsGPU.rectComponents, scaleBy, groupTag, gpd.fs.getDevData(),gpd.idToIdxs.d_data.data(), state->rigidBodiesMask.d_data.data());
+        }
     }
 }
 

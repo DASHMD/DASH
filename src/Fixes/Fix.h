@@ -89,7 +89,7 @@ public:
      *
      * \todo Make this function purely virtual
      */
-    virtual bool postRun() { return true; }
+    virtual bool postRun() { prepared=false; return true; }
 
     //! Perform operations at the start of a simulation step
     /*!
@@ -102,6 +102,15 @@ public:
     virtual bool postNVE_V() {return true; }
     virtual bool postNVE_X() {return true; } //postNVE_V and X are just called in first half step
 
+    //! Prepares a fix for run if it must be prepared after all other fixes have been instantiated
+    /*!
+     * \return False if a problem occurred, else True
+     *
+     * This function is primarily useful for DataComputers and fixes that need to know the current 
+     * state of the simulation in their absence (e.g., barostats, thermostats)
+     */
+    virtual bool prepareFinal() {return true; }
+
     //! Perform operations at the end of a simulation step
     /*!
      * \return False if a problem was encountered, else return true
@@ -110,6 +119,13 @@ public:
      */
     virtual bool stepFinal() { return true; }
 
+    //! Counts the reduction in system DOF due to this fix
+    /*!
+     * \return 0 if no constraints, otherwise positive integer quantifying the reduction in DOF
+     *
+     * This function is called by DataComputerTemperature when it is preparing for a run.
+     */
+    virtual int removeNDF() {return 0;}
     //! Apply fix
     /*!
      * \param virialMode Compute virials for this Fix
@@ -211,6 +227,19 @@ public:
         return std::vector<float>();
     }
 
+
+    //! Returns the atom ids of atoms belonging to rigid bodies as denoted by this Fix.
+    /*!
+     * \return vector containing atom ids of atoms belonging to rigid bodies, or empty list if not 
+     *         applicable to this fix (non-constraint fix).
+     */
+
+    virtual std::vector<int> getRigidAtoms() {
+        return std::vector<int>();
+    }
+
+    virtual void scaleRigidBodies(float3 scaleBy, uint32_t groupTag) {};
+
     //! Check that all given Atoms are valid
     /*!
      * \param atoms List of Atom pointers
@@ -251,8 +280,10 @@ public:
     bool requiresCharges; //!< True if Fix needs charges.  Fixes will be stored if any fix has this as true
     //these are 
     bool isThermostat; //!< True if is a thermostat. Used for barostats.
+    bool requiresForces; //!< True if the fix requires forces on instantiation; defaults to false.
     bool requiresPostNVE_V;
 
+    bool prepared; //!< True if the fix has been prepared; false otherwise.
     bool canOffloadChargePairCalc;
     bool canAcceptChargePairCalc;
     

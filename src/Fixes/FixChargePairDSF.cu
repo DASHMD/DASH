@@ -44,6 +44,12 @@ void FixChargePairDSF::setParameters(float alpha_,float r_cut_)
   shift=std::erfc(alpha*r_cut)/(r_cut*r_cut)+A*exp(-alpha*alpha*r_cut*r_cut)/(r_cut);
 }
 
+bool FixChargePairDSF::prepareForRun() {
+    FixCharge::prepareForRun();
+
+    prepared = true;
+    return prepared;
+}
 
 std::vector<float> FixChargePairDSF::getRCuts() { 
     std::vector<float> res;

@@ -7,6 +7,9 @@
 
 #include "GPUArrayGlobal.h"
 #include "GPUArrayDeviceGlobal.h"
+#include "GPUData.h"
+
+#include "Tunable.h"
 
 #include "Tunable.h"
 
@@ -29,7 +32,10 @@ class GridGPU : public Tunable {
 private:
     bool streamCreated; //!< True if a stream was created in initStream()
 
-    /*! \brief Initialize arrays */
+    /*! \brief Initialize arrays 
+     * 
+     *  Acts on the pointer to GPUData given to this GridGPU instance in the GridGPU constructor
+     */
     void initArrays();
 
     /*! \brief Initialize strem
@@ -80,7 +86,9 @@ public:
     int3 ns;        //!< Number of grid points in each dimension
     GPUArrayDeviceGlobal<uint> neighborlist;    //!< List of atoms within cutoff radius of atom at GPU idx
     State *state;   //!< Pointer to the simulation state
+    GPUData *gpd;   //!< Pointer to the gpu data for this grid
     float neighCutoffMax;   //!< largest cutoff radius of any interacting pair + padding, default value for grid building
+    double padding; //!< padding for this grid
 
     /*! \brief Constructor
      *
@@ -94,7 +102,7 @@ public:
      * resolution will be the next larger value such that the box size is
      * a multiple of the resolution.
      */
-    GridGPU(State *state_, float dx, float dy, float dz, float neighCutoffMax, int exclusionMode_);
+    GridGPU(State *state_, float dx, float dy, float dz, float neighCutoffMax, int exclusionMode_, double padding_, GPUData *gpd_, int nPerRingPoly=1);
 
     /*! \brief Default constructor
      *
@@ -193,6 +201,26 @@ public:
     BoundsGPU boundsLastBuild;
     void setBounds(BoundsGPU &newBounds);
     float3 minGridDim;
+
+    /*! \brief Set flag to true/false
+     *
+     * \param bool the value of the flag
+     *
+     * The only GPUData that will be copied and sorted consists 
+     * of the positions, as opposed to the velocities and forces as well.
+     * Of course, atom/molecule id's are sorted as well.
+     *
+     */
+    void onlyPositions(bool);
+
+    // value of flag denoted by above function; defaults to false
+    bool onlyPositionsFlag;
+    
+    void doExclusions(bool);
+    bool exclusions;
+
+    // input value to Grid
+    int nPerRingPoly;
     /*! \brief Copy atom positions to xsLastBuild
      *
      * Copies data from state->gpd.xs to xsLastBuild.

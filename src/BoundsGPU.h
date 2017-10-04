@@ -27,8 +27,11 @@ public:
         //consider calcing invrectcomponents using doubles
         lo = lo_;
         rectComponents = rectComponents_;
+        rectComponentsD = make_double3(rectComponents_);
         invRectComponents = 1.0f / rectComponents;
+        invRectComponentsD = 1.0f / rectComponentsD;
         periodic = periodic_;
+        periodicD = make_double3(periodic_);
     }
 
     /*! \brief Default constructor */
@@ -37,10 +40,13 @@ public:
     float3 rectComponents; //!< 3 sides - xx, yy, zz
     float3 invRectComponents; //!< Inverse of the box expansion in standard
                        //!< coordinates
+    double3 rectComponentsD;
+    double3 invRectComponentsD; //!< Inverse of the box expansion in standard coordinates and double precision
+
     float3 lo; //!< Point of origin
     float3 periodic; //!< Stores whether box is periodic in x-, y-, and
                      //!< z-direction
-
+    double3 periodicD; //!< Stores whether box is periodic in x-, y- and z-direction, double precision
     /*! \brief Return an unskewed copy of this box
      *
      * \return Unskewed copy of this box.
@@ -75,9 +81,17 @@ public:
      */
     __host__ __device__ float3 minImage(float3 v) {
         float3 img = make_float3(rintf(v.x * invRectComponents.x), rintf(v.y * invRectComponents.y), rintf(v.z * invRectComponents.z));
+
         v -= rectComponents * img * periodic;
         return v;
     }
+    
+    __host__ __device__ double3 minImage(double3 v) {
+        double3 img = make_double3(rint(v.x * invRectComponentsD.x), rint(v.y * invRectComponentsD.y), rint(v.z * invRectComponentsD.z));
+        v -= make_double3(rectComponents) * img * (periodicD);
+        return v;
+    }
+    
     __host__ __device__ float volume() {
         return rectComponents.x * rectComponents.y * rectComponents.z;
     }
@@ -96,6 +110,18 @@ public:
         return false;
     }
 
+    __host__ __device__ float4 wrapCoords(float4 v) {
+        // do something here? its a periodic wrap
+        float4 newPos = v;
+        float id = v.w;
+        float3 trace = rectComponents;
+        float3 diffFromLo = make_float3(newPos) - lo;
+        float3 imgs = floorf(diffFromLo / trace); //are unskewed at this point
+        newPos -= make_float4(trace * imgs * periodic);
+        newPos.w = id;
+
+        return newPos;
+    }
     //around center
     __host__ void scale(float3 scaleBy) {
         float3 center = lo + rectComponents * 0.5;
@@ -103,9 +129,10 @@ public:
         float3 diff = center-lo;
         diff *= scaleBy;
         lo = center - diff;
-
-
-        invRectComponents = 1 / rectComponents;
+        invRectComponents =  1.0 / rectComponents;
+        
+        rectComponentsD = make_double3(rectComponents);
+        invRectComponentsD = 1.0 / rectComponentsD;
 
     }
     bool operator ==(BoundsGPU &other) {

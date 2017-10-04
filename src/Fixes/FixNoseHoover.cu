@@ -17,6 +17,10 @@ namespace py = boost::python;
 
 std::string NoseHooverType = "NoseHoover";
 
+
+
+#define n_ys_5 {
+
 // CUDA function to calculate the total kinetic energy
 
 // CUDA function to rescale particle velocities
@@ -114,8 +118,8 @@ FixNoseHoover::FixNoseHoover(boost::shared_ptr<State> state_, std::string handle
              ), 
                 kineticEnergy(GPUArrayGlobal<float>(2)),
                 ke_current(0.0), ndf(0),
-                chainLength(3), nTimesteps(1), n_ys(1),
-                pchainLength(3),
+                chainLength(20), nTimesteps(1), n_ys(1),
+                pchainLength(20),
                 nTimesteps_b(1), n_ys_b(1),
                 weight(std::vector<double>(n_ys,1.0)),
                 //thermPos(std::vector<double>(chainLength,0.0)),
@@ -142,7 +146,7 @@ FixNoseHoover::FixNoseHoover(boost::shared_ptr<State> state_, std::string handle
 
     // denote whether or not this is the first time prepareForRun was called
     // --- need this, because we need to initialize this with proper virials
-    firstPrepareCalled = true;
+    //firstPrepareCalled = true;
 
 }
 
@@ -233,18 +237,20 @@ void FixNoseHoover::setTemperature(py::list intervals, py::list temps, double ti
 
 
 
-bool FixNoseHoover::prepareForRun()
+//bool FixNoseHoover::prepareForRun()
+bool FixNoseHoover::prepareFinal()
 {
 
     // if we are barostatting, we need the virials.
     // if this is the first time that prepareForRun was called, we do not have them
     // so, return false and it'll get called again
+    /*
     if (firstPrepareCalled && barostatting) {
         firstPrepareCalled = false;
         return false;
 
     }
-
+    */
     // get our boltzmann constant
     boltz = state->units.boltz;
 
@@ -382,8 +388,8 @@ bool FixNoseHoover::prepareForRun()
         
     }
 
-
-    return true;
+    prepared = true;
+    return prepared;
 }
 bool FixNoseHoover::postRun()
 {
@@ -418,13 +424,12 @@ bool FixNoseHoover::stepInit()
         setPointTemperature = tempInterpolator.getCurrentVal();
         
         // compare values and update accordingly
-            // update the masses associated with thermostats for the barostats and the particles
+        // update the masses associated with thermostats for the barostats and the particles
         updateBarostatMasses(true);
         updateBarostatThermalMasses(true);
         updateThermalMasses();
         // exp(iL_{T_{BARO} \frac{\Delta t}{2})
         // -- variables that must be initialized/up-to-date:
-        //    etaPressureMass, etaPressureVel, etaPressForce must all be /initialized (updated here)
         barostatThermostatIntegrate(true);
 
         // exp(iL_{T_{PART}} \frac{\Delta t}{2})
@@ -458,6 +463,7 @@ bool FixNoseHoover::stepInit()
         
         // and the current hydrostatic pressure (we computed this above already)
         hydrostaticPressure = setPointPressure;
+        
         // and get the current pressure to our local variables; here we do the partitioning according to 
         // the couple style: {NONE,XYZ}
         getCurrentPressure();
@@ -505,7 +511,6 @@ bool FixNoseHoover::postNVE_V() {
 
         // scale particle velocities due to barostat variables
         scaleVelocitiesBarostat(true);
-        //rescaleVolume();
 
         // and our operator acting on epsilon (volume rescale) --> changes particle positions as well
         rescaleVolume();
@@ -1004,6 +1009,7 @@ void FixNoseHoover::rescaleVolume() {
     if (pFlags[2]) {
         volScaleXYZ.z = std::exp(pressVel[2] * dt);
     }
+
     Mod::scaleSystem(state, volScaleXYZ, groupTag);
 
 }

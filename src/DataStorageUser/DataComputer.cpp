@@ -2,7 +2,7 @@
 #include "State.h"
 namespace py = boost::python;
 using namespace MD_ENGINE;
-DataComputer::DataComputer(State *state_, std::string computeMode_, bool requiresVirials_) {
+DataComputer::DataComputer(State *state_, std::string computeMode_, bool requiresVirials_) : dataMultiple(1) {
     state = state_;
     computeMode = computeMode_;
     requiresVirials = requiresVirials_;
@@ -15,13 +15,13 @@ DataComputer::DataComputer(State *state_, std::string computeMode_, bool require
 void DataComputer::prepareForRun() {
     if (computeMode=="scalar") {
         gpuBufferReduce = GPUArrayGlobal<float>(2);
-        gpuBuffer = GPUArrayGlobal<float>(state->atoms.size());
+        gpuBuffer = GPUArrayGlobal<float>(state->atoms.size() * dataMultiple);
     } else if (computeMode=="tensor") {
         gpuBufferReduce = GPUArrayGlobal<float>(2*6);
-        gpuBuffer = GPUArrayGlobal<float>(state->atoms.size() * 6);
+        gpuBuffer = GPUArrayGlobal<float>(state->atoms.size() * 6 * dataMultiple);
     } else if (computeMode=="vector") {
-        gpuBuffer = GPUArrayGlobal<float>(state->atoms.size());
-        sorted = std::vector<double>(state->atoms.size());
+        gpuBuffer = GPUArrayGlobal<float>(state->atoms.size() * dataMultiple);
+        sorted = std::vector<double>(state->atoms.size() * dataMultiple);
     } else {
         std::cout << "Invalid data type " << computeMode << ".  Must be scalar, tensor, or vector" << std::endl;
     }

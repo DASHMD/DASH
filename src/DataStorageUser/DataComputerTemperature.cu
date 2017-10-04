@@ -2,6 +2,9 @@
 #include "cutils_func.h"
 #include "boost_for_export.h"
 #include "State.h"
+#include "Fix.h"
+#include "Group.h"
+
 namespace py = boost::python;
 using namespace MD_ENGINE;
 
@@ -31,7 +34,6 @@ void DataComputerTemperature::computeScalar_GPU(bool transferToCPU, uint32_t gro
 
 void DataComputerTemperature::prepareForRun() {
     DataComputer::prepareForRun();
-    //then my own stuff
 }
 
 
@@ -69,21 +71,13 @@ void DataComputerTemperature::computeTensor_GPU(bool transferToCPU, uint32_t gro
 }
 
 void DataComputerTemperature::computeScalar_CPU() {
-    int n;
+    
+    //int n;
     double total = gpuBuffer.h_data[0];
-    if (lastGroupTag == 1) {
-        n = state->atoms.size();//* (int *) &gpuBuffer.h_data[1];
-    } else {
-        float *asfloat  = gpuBuffer.h_data.data() + 1;
-        n = * (int *) asfloat;
-    }
-    if (state->is2d) {
-        //ndf = 2*(n-1); //-1 is analagous to extra_dof in lammps
-        ndf = 2*n; // changed from a above to permit 1 particle thermostatting
-    } else {
-        //ndf = 3*(n-1);
-        ndf = 3*n; // changed from a above to permit 1 particle thermostatting
-    }
+    Group &thisGroup = state->groups[lastGroupTag];
+
+    ndf = thisGroup.getNDF();
+    
     totalKEScalar = total * state->units.mvv_to_eng; 
     tempScalar = state->units.mvv_to_eng * total / (state->units.boltz * ndf); 
 }
@@ -137,17 +131,24 @@ void DataComputerTemperature::computeTensorFromScalar() {
 }
 
 void DataComputerTemperature::computeScalarFromTensor() {
-    int n;
+    //int n;
+    /*
     if (lastGroupTag == 1) {
-        n = state->atoms.size();//* (int *) &gpuBuffer.h_data[1];
+        n = state->atoms.size();//\* (int *) &gpuBuffer.h_data[1];
     } else {
         n = * (int *) &gpuBuffer.h_data[1];
     }
+    */ //
+    /*
     if (state->is2d) {
         ndf = 2*(n-1); //-1 is analagous to extra_dof in lammps
     } else {
         ndf = 3*(n-1);
     }
+    */
+    Group &thisGroup = state->groups[lastGroupTag];
+    ndf = thisGroup.getNDF();
+    //ndf = state->groups[lastGroupTag].getNDF();
     totalKEScalar = (tempTensor[0] + tempTensor[1] + tempTensor[2]) * state->units.boltz;
     tempScalar = totalKEScalar / ndf;
 

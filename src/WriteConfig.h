@@ -26,6 +26,8 @@ public:
 	std::string groupHandle;
     int writeEvery;
 	int groupBit;
+    
+    bool andVelocities;
 
     bool isXML;
     bool unwrapMolecules;

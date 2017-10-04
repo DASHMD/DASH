@@ -48,7 +48,8 @@ bool FixDeform::prepareForRun() {
         
 
     }
-    return true;
+    prepared = true;
+    return prepared;
 }
 
 bool FixDeform::stepFinal() {

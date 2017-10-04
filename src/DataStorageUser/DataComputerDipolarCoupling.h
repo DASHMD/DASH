@@ -26,8 +26,8 @@ namespace MD_ENGINE {
             std::string groupHandleA;
             std::string groupHandleB;
             GPUArrayGlobal<float> rCutSqrArray;
-            GPUArrayGlobal<float> coalescedInvR3;
-            std::vector<double> couplings;
+            GPUArrayGlobal<float> coalescedInvR6;
+            std::vector<double> couplingsSqr;
             double magnetoA;
             double magnetoB;
             //so these are just length 2 arrays.  First value is used for the result of the sum.  Second value is bit-cast to an int and used to cound how many values are present.

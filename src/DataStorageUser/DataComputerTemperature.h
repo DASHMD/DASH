@@ -4,6 +4,7 @@
 
 #include "DataComputer.h"
 #include "Virial.h"
+#include "Group.h"
 
 namespace MD_ENGINE {
     class DataComputerTemperature : public DataComputer {

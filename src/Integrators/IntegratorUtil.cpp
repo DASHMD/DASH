@@ -29,6 +29,25 @@ void IntegratorUtil::force(int virialMode) {
     }
 };
 
+void IntegratorUtil::forceInitial(int virialMode) {
+    int simTurn = state->turn;
+    std::vector<Fix *> &fixes = state->fixes;
+    //okay - things with order pref == -1 are pair forces.  They for first.  Afterwards, we compute f dot r if necessary, then do the rest
+  //  bool computedFDotR = false;
+    for (Fix *f : fixes) {
+        if (! (simTurn % f->applyEvery)) {
+           // if (virialMode == 1 and f->orderPreference >= 0 and not computedFDotR) {
+           //     Mod::FDotR(state);
+           //     computedFDotR = true;
+           // }
+            if (f->prepared) {
+                f->compute(virialMode);
+                f->setVirialTurn();
+            }
+        }
+    }
+};
+
 void IntegratorUtil::postNVE_V() {
     int simTurn = state->turn;
     std::vector<Fix *> &fixes = state->fixes;

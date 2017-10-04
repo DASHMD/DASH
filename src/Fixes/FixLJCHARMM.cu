@@ -164,7 +164,8 @@ bool FixLJCHARMM::prepareForRun() {
         printf("Warning: FixLJCharmm complains that 1-4 neighbor coefficients cannot be 0\n");
         assert(state->specialNeighborCoefs[2] != 0);
     }
-    return true;
+    prepared = true;
+    return prepared;
 }
 
 string FixLJCHARMM::restartChunk(string format) {

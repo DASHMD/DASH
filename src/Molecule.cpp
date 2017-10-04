@@ -41,6 +41,15 @@ void Molecule::rotateRandom() {
 
 }
 
+std::vector<int> Molecule::getAtoms() {
+    std::vector<int> atomIds;
+    for (int id: ids) {
+        atomIds.push_back(id);
+    }
+    return atomIds;
+}
+
+
 Vector Molecule::COM() {
     Vector weightedPos(0, 0, 0);
     double sumMass = 0;

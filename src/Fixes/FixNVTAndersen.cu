@@ -57,7 +57,8 @@ bool FixNVTAndersen::prepareForRun() {
     tempComputer.prepareForRun();
     randStates = GPUArrayDeviceGlobal<curandState_t>(state->atoms.size());
     initRand<<<NBLOCK(state->atoms.size()), PERBLOCK>>>(state->atoms.size(), randStates.data(), seed,state->turn);
-    return true;
+    prepared = true;
+    return prepared;
 }
 
 void __global__ resample_no_tags_cu(int nAtoms, float4 *vs, curandState_t *randStates, float tempSet, float nudt, float boltz, float mvv_to_e) {

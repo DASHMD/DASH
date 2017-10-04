@@ -10,6 +10,8 @@
 #include "State.h"
 #include "Fix.h"
 #include "cutils_func.h"
+#include "globalDefs.h"
+#include "FixTIP4PFlexible.h"
 
 using namespace MD_ENGINE;
 using std::cout;
@@ -21,13 +23,24 @@ __global__ void nve_v_cu(int nAtoms, float4 *vs, float4 *fs, float dtf) {
     int idx = GETIDX();
     if (idx < nAtoms) {
         // Update velocity by a half timestep
+        //double4 vel = make_double4(vs[idx]);
         float4 vel = vs[idx];
+        //double invmass = vel.w;
         float invmass = vel.w;
-
+        //double4 force = make_double4(fs[idx]);
         float4 force = fs[idx];
+        
+        // ghost particles should not have their velocities integrated; causes overflow
+        if (invmass > INVMASSBOOL) {
+            vs[idx] = make_float4(0.0f, 0.0f, 0.0f,invmass);
+            fs[idx] = make_float4(0.0f, 0.0f, 0.0f,force.w);
+            return;
+        }
 
+        //double3 dv = dtf * invmass * make_double3(force);
         float3 dv = dtf * invmass * make_float3(force);
         vel += dv;
+        //vs[idx] = make_float4(vel);
         vs[idx] = vel;
         fs[idx] = make_float4(0.0f, 0.0f, 0.0f, force.w);
     }
@@ -37,20 +50,25 @@ __global__ void nve_x_cu(int nAtoms, float4 *xs, float4 *vs, float dt) {
     int idx = GETIDX();
     if (idx < nAtoms) {
         // Update position by a full timestep
+        //double4 vel = make_double4(vs[idx]);
+        //double4 pos = make_double4(xs[idx]);
         float4 vel = vs[idx];
         float4 pos = xs[idx];
 
         //printf("pos %f %f %f\n", pos.x, pos.y, pos.z);
         //printf("vel %f %f %f\n", vel.x, vel.y, vel.z);
+        //double3 dx = dt*make_double3(vel);
         float3 dx = dt*make_float3(vel);
+        //printf("dx %f %f %f\n",dx.x, dx.y, dx.z);
         pos += dx;
+        //xs[idx] = make_float4(pos);
         xs[idx] = pos;
     }
 }
 
 __global__ void nve_xPIMD_cu(int nAtoms, int nPerRingPoly, float omegaP, float4 *xs, float4 *vs, BoundsGPU bounds, float dt) {
 
-   
+
 }
 
 //so preForce_cu is split into two steps (nve_v, nve_x) if any of the fixes (barostat, for example), need to throw a step in there (as determined by requiresPostNVE_V flag)
@@ -60,22 +78,27 @@ __global__ void preForce_cu(int nAtoms, float4 *xs, float4 *vs, float4 *fs,
     int idx = GETIDX();
     if (idx < nAtoms) {
         // Update velocity by a half timestep
-        float4 vel = vs[idx];
-        float invmass = vel.w;
+        double4 vel = make_double4(vs[idx]);
+        double invmass = vel.w;
+        double4 force = make_double4(fs[idx]);
+        
+        if (invmass > INVMASSBOOL) {
+            vs[idx] = make_float4(0.0f, 0.0f, 0.0f,invmass);
+            fs[idx] = make_float4(0.0f, 0.0f, 0.0f, force.w);
+            return;
+        }
 
-        float4 force = fs[idx];
-
-        float3 dv = dtf * invmass * make_float3(force);
+        double3 dv = dtf * invmass * make_double3(force);
         vel += dv;
-        vs[idx] = vel;
+        vs[idx] = make_float4(vel);
 
         // Update position by a full timestep
-        float4 pos = xs[idx];
+        double4 pos = make_double4(xs[idx]);
 
         //printf("vel %f %f %f\n", vel.x, vel.y, vel.z);
-        float3 dx = dt*make_float3(vel);
+        double3 dx = dt*make_double3(vel);
         pos += dx;
-        xs[idx] = pos;
+        xs[idx] = make_float4(pos);
 
         // Set forces to zero before force calculation
         fs[idx] = make_float4(0.0f, 0.0f, 0.0f, force.w);
@@ -87,6 +110,7 @@ __global__ void preForce_cu(int nAtoms, float4 *xs, float4 *vs, float4 *fs,
 __global__ void preForcePIMD_cu(int nAtoms, int nPerRingPoly, float omegaP, float4 *xs, float4 *vs, float4 *fs, BoundsGPU bounds,
                             float dt, float dtf)
 {
+
 }
     //if (useThread && amRoot ) {
     //    printf("--xx = %f\n",xs[idx].x);
@@ -109,14 +133,17 @@ __global__ void postForce_cu(int nAtoms, float4 *vs, float4 *fs, float dtf)
     int idx = GETIDX();
     if (idx < nAtoms) {
         // Update velocities by a halftimestep
-        float4 vel = vs[idx];
-        float invmass = vel.w;
+        double4 vel = make_double4(vs[idx]);
+        double invmass = vel.w;
+        if (invmass > INVMASSBOOL) {
+            vs[idx] = make_float4(0.0f, 0.0f, 0.0f,invmass);
+            return;
+        }
+        double4 force = make_double4(fs[idx]);
 
-        float4 force = fs[idx];
-
-        float3 dv = dtf * invmass * make_float3(force);
+        double3 dv = dtf * invmass * make_double3(force);
         vel += dv;
-        vs[idx] = vel;
+        vs[idx] = make_float4(vel);
     }
 }
 
@@ -142,27 +169,35 @@ double IntegratorVerlet::run(int numTurns)
 {
 
     basicPreRunChecks();
-    //basicPrepare(numTurns); //nlist built here
-    //force(false);
 
-    std::vector<bool> prepared = basicPrepare(numTurns);
-    force(true);
+    // basicPrepare now only handles State prepare and sending global State data to device
+    basicPrepare(numTurns);
 
-    for (int i = 0; i<prepared.size(); i++) {
-        if (!prepared[i]) {
-            for (Fix *f : state->fixes) {
-                bool isPrepared = f->prepareForRun();
-                if (!isPrepared) {
-                    mdError("A fix is unable to be instantiated correctly.");
-                }
-            }
-        }
-    }
+    // prepare the fixes that do not require forces to be computed
+    // -- e.g., isotropic pair potentials
+    prepareFixes(false);
+   
+    // iterates and computes forces only from fixes that return (prepared==true)
+    forceInitial(true);
+
+    // prepare the fixes that require forces to be computed on instantiation;
+    // -- e.g., constraints
+    prepareFixes(true);
+    
+    // finally, prepare barostats, thermostats, datacomputers, etc.
+    // datacomputers are prepared first, then the barostats, thermostats, etc.
+    // prior to datacomputers being prepared, we iterate over State, and the groups in simulation 
+    // collect their NDF associated with their group
+    prepareFinal();
+   
+    // get our PIMD thermostat
     if (state->nPerRingPoly>1) {
         setInterpolator();
     }
-    int periodicInterval = state->periodicInterval;
 
+    verifyPrepared();
+
+    int periodicInterval = state->periodicInterval;
 	
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -207,7 +242,6 @@ double IntegratorVerlet::run(int numTurns)
 
         //quits if ctrl+c has been pressed
         checkQuit();
-
 
         // Perform second half of velocity-Verlet step
         postForce();

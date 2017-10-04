@@ -101,8 +101,8 @@ bool FixWCA::prepareForRun() {
 //     prepareParameters(rCutHandle, fillRCut, processRCut, true, fillRCutDiag);
     sendAllToDevice();
     setEvalWrapper();
-    
-    return true;
+    prepared = true;
+    return prepared;
 }
 
 void FixWCA::setEvalWrapper() {

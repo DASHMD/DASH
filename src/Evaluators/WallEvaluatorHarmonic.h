@@ -32,6 +32,18 @@ class EvaluatorWallHarmonic {
            };
 
         };
+
+        // double precision
+		inline __device__ double3 force(double magProj, double3 forceDir) {
+           if (magProj < r0) { 
+                double forceScalar = k * (r0 - magProj); 
+                return forceDir * forceScalar;
+           } else {
+                return forceDir * 0.0;
+           };
+
+        };
+
 };
 #endif
 

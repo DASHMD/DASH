@@ -29,15 +29,16 @@ private:
     BoundsGPU boundsGPU;
 
     MD_ENGINE::DataComputerTemperature tempComputer;
-    bool prepareForRun();
-    void compute(int);
+    bool prepareFinal();
+    //void compute(int);
     bool postRun();
+    bool stepFinal();
 
 public:
     boost::shared_ptr<Bounds> thermoBounds;
-    FixNVTRescale(boost::shared_ptr<State>, std::string handle_, std::string groupHandle_, boost::python::list intervals, boost::python::list temps_, int applyEvery = 10);
-    FixNVTRescale(boost::shared_ptr<State>, std::string handle_, std::string groupHandle_, boost::python::object tempFunc_, int applyEvery = 10);
-    FixNVTRescale(boost::shared_ptr<State>, std::string handle_, std::string groupHandle_, double temp_, int applyEvery = 10);
+    FixNVTRescale(boost::shared_ptr<State>, std::string handle_, std::string groupHandle_, boost::python::list intervals, boost::python::list temps_, int applyEvery = 10, int orderPreference = 35);
+    FixNVTRescale(boost::shared_ptr<State>, std::string handle_, std::string groupHandle_, boost::python::object tempFunc_, int applyEvery = 10, int orderPreference = 35);
+    FixNVTRescale(boost::shared_ptr<State>, std::string handle_, std::string groupHandle_, double temp_, int applyEvery = 10, int orderPreference = 35);
     Interpolator *getInterpolator(std::string);
 
 };

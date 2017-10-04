@@ -6,7 +6,6 @@
 #include "State.h"
 #include "cutils_func.h"
 #include "ReadConfig.h"
-#include "EvaluatorWrapper.h"
 #include "PairEvaluatorLJ.h"
 #include "EvaluatorWrapper.h"
 //#include "ChargeEvaluatorEwald.h"
@@ -117,7 +116,8 @@ bool FixLJCut::prepareForRun() {
 
     sendAllToDevice();
     setEvalWrapper();
-    return true;
+    prepared = true;
+    return prepared;
 }
 
 string FixLJCut::restartChunk(string format) {

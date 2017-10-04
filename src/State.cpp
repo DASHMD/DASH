@@ -8,7 +8,7 @@
 #include "PythonOperation.h"
 #include "DataManager.h"
 #include "DataSetUser.h"
-
+#include "globalDefs.h"
 /* State is where everything is sewn together. We set global options:
  *   - gpu cuda device data and options
  *   - atoms and groups
@@ -29,6 +29,7 @@ using namespace MD_ENGINE;
 namespace py = boost::python;
 State::State() : units(&dt) {
     groupTags["all"] = (unsigned int) 1;
+    groups[groupTags["all"]]= Group(this,"all");
     is2d = false;
     rCut = RCUT_INIT;
     padding = PADDING_INIT;
@@ -58,12 +59,12 @@ State::State() : units(&dt) {
     nPerRingPoly  = 1;
     exclusionMode = EXCLUSIONMODE::DISTANCE;
 
+    nlistBuildTurns = std::vector<int> ();
     nThreadPerAtom = 1;
     nThreadPerBlock = 256;
 
     tuneEvery = 1000000;
     nextForceBuild = 0;
-
 
 }
 
@@ -134,7 +135,15 @@ bool State::addAtomDirect(Atom a) {
         a.pos[2] = 0;
     }
 
+    // constraints will remove any extraneous DOF when they are getting prepared prior to run()
+    if (is2d) {
+        a.ndf = 2;
+    } else {
+        a.ndf = 3;
+    }
+
     atoms.push_back(a);
+    //std::cout << "adding atom id " << a.id << " of type " << a.type << " with mass " << a.mass << std::endl;
     return true;
 }
 
@@ -481,7 +490,9 @@ float State::getMaxRCut() {
 void State::initializeGrid() {
     double maxRCut = getMaxRCut();// ALSO PADDING PLS
     double gridDim = maxRCut + padding;
-    gridGPU = GridGPU(this, gridDim, gridDim, gridDim, gridDim, exclusionMode);
+
+    // copy value of nPerRingPoly to make it local to gpd instance
+    gridGPU = GridGPU(this, gridDim, gridDim, gridDim, gridDim, exclusionMode, this->padding, &gpd,nPerRingPoly);
     //testing
     //nThreadPerBlock = 64;
     //nThreadPerAtom = 4;
@@ -490,8 +501,6 @@ void State::initializeGrid() {
     //gridGPU.initArraysTune();
 
 }
-
-
 
 void State::copyAtomDataToGPU(std::vector<int> &idToIdx) {
     std::vector<float4> xs_vec, vs_vec, fs_vec;
@@ -527,14 +536,16 @@ void State::copyAtomDataToGPU(std::vector<int> &idToIdx) {
 }
 
 bool State::prepareForRun() {
-    // fixes have already prepared by the time the integrator calls this prepare
-
-
+    // so, Fixes are /not/ prepared at the time that this is called;
+    // but, they /are/ instantiated, and we know which ones are active (our list of fixes is up-to-date)
+    // so, this is ok.
+    
     requiresCharges = false;
     std::vector<bool> requireCharges = LISTMAP(Fix *, bool, fix, fixes, fix->requiresCharges);
     if (!requireCharges.empty()) {
         requiresCharges = *std::max_element(requireCharges.begin(), requireCharges.end());
     }
+    
     requiresPostNVE_V = false;
     std::vector<bool> requirePostNVE_V = LISTMAP(Fix *, bool, fix, fixes, fix->requiresPostNVE_V);
     if (!requirePostNVE_V.empty()) {
@@ -551,12 +562,21 @@ bool State::prepareForRun() {
     fs_vec.reserve(nAtoms);
     ids.reserve(nAtoms);
     qs.reserve(nAtoms);
-
+   
     for (const auto &a : atoms) {
         xs_vec.push_back(make_float4(a.pos[0], a.pos[1], a.pos[2],
                                      *(float *)&a.type));
-        vs_vec.push_back(make_float4(a.vel[0], a.vel[1], a.vel[2],
-                                     1/a.mass));
+        if (a.mass == 0.0) {
+            // make the inverse mass a very large, but finite number
+            // -- must be representable by floating point
+            // -- make it a few orders of magnitude small than 1e38 so overflow is
+            //    never an issue
+            vs_vec.push_back(make_float4(a.vel[0], a.vel[1], a.vel[2],
+                                         INVMASSLESS));
+        } else {
+            vs_vec.push_back(make_float4(a.vel[0], a.vel[1], a.vel[2],
+                                         1/a.mass));
+        }
         fs_vec.push_back(make_float4(a.force[0], a.force[1], a.force[2],
                                      *(float *)&a.groupTag));
         ids.push_back(a.id);
@@ -697,6 +717,60 @@ bool State::runtimeHostOperation(std::function<void (int64_t )> cb, bool async) 
     //happens
 }
 
+// this function is called by barostatting methods 
+void State::findRigidBodies() {
+
+    if (this->rigidBodies) {
+
+        std::vector<int> allRigidAtomIds;
+
+        for (Fix *f: this->fixes) {
+            // returns an array of atom ids, or nullptr
+            std::vector<int> rigidAtomIds = f->getRigidAtoms();
+            if (rigidAtomIds.size() > 0) {
+                for (int i = 0; i < rigidAtomIds.size(); i++) {
+                    allRigidAtomIds.push_back(rigidAtomIds[i]);
+                }
+            }
+        }
+
+
+        // initialize the vector mask to true (we assume atoms do not belong to rigid bodies)
+        // ---- as another clarification, rigidAtoms evaluates to true when the barostat (e.g., FixNoseHoover)
+        //      is responsible for scaling and translation of the positions of a given atom.
+        //      if the atom belongs to a rigid body, then the constraint algorithm enforcing the rigidity 
+        //      is responsible for scaling & translation of the rigid body, and this mask evaluates to false 
+        //      for that atom (and the other atoms within the rigid body).
+        rigidAtoms.reserve(this->atoms.size());
+        for (int i = 0; i < rigidAtoms.size(); i++) {
+            rigidAtoms[i] = 1;
+        }
+
+        for (int i = 0; i < allRigidAtomIds.size(); i++) {
+            // so, this contains the ids that we tell the barostat should /not/ have their 
+            // positions modified by the barostat, but rather by their constraint algorithm
+            int thisId = allRigidAtomIds[i];
+            rigidAtoms[thisId] = 0;
+        }
+    
+        // and finally, set the GPUArrayDeviceGlobal to the rigidAtoms array.
+        rigidBodiesMask.set(rigidAtoms);
+        rigidBodiesMask.dataToDevice();
+
+
+    } else {
+        
+        // nominally set the vector and GPUArrayDeviceGlobal array to some 1-value so that we aren't
+        // playing with bad values anywhere
+        rigidAtoms.resize(1,true);
+        rigidBodiesMask = GPUArrayGlobal<int>(1);
+        rigidBodiesMask.dataToDevice();
+        
+    }
+}
+
+
+
 bool State::downloadFromRun() {
     std::vector<float4> &xs = gpd.xs.h_data;
     std::vector<float4> &vs = gpd.vs.h_data;
@@ -747,7 +821,14 @@ bool State::addToGroup(std::string handle, std::function<bool (Atom *)> testF) {
 }
 
 
+void State::populateGroupMap() {
+    // iterate over our groups map and call computeNDF();
+    for (auto it = groups.begin(); it != groups.end(); it++) {
+        it->second.computeNDF();
+    }
 
+
+}
 
 
 bool State::deleteGroup(std::string handle) {
@@ -790,14 +871,21 @@ int State::countNumInGroup(uint32_t tag) {
 
 uint State::addGroupTag(std::string handle) {
     uint working = 0;
+    // first assert that this handle does not exist within the keys of groupTags map
     assert(groupTags.find(handle) == groupTags.end());
+    // fill the bitmask with current occupied bits
     for (auto it=groupTags.begin(); it!=groupTags.end(); it++) {
         working |= it->second;
     }
+    // shift until we find a bit that is not occupado; then return exactly that bit flipped, all others zero
+    // -- start off shifted once, because groupTag 'all' is always present
+    //    so, as long as we preclude redundancy in the groupTags map, we will 
+    //    avoid that issue with the groups map as well.
     for (int i=0; i<32; i++) {
         uint potentialTag = 1 << i;
         if (! (working & potentialTag)) {
             groupTags[handle] = potentialTag;
+            groups[potentialTag] = Group(this,handle);
             return potentialTag;
         }
     }
@@ -807,7 +895,9 @@ uint State::addGroupTag(std::string handle) {
 bool State::removeGroupTag(std::string handle) {
     auto it = groupTags.find(handle);
     assert(it != groupTags.end());
+    uint32_t tag = it->second;
     groupTags.erase(it);
+    groups.erase(tag);
     return true;
 }
 
@@ -1046,6 +1136,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(State_seedRNG_overloads,State::seedRNG,0,
                 .def_readwrite("periodicInterval", &State::periodicInterval)
                 .def_readwrite("rCut", &State::rCut)
                 .def_readwrite("nPerRingPoly", &State::nPerRingPoly)
+                .def_readwrite("nlistBuildTurns", &State::nlistBuildTurns)
                 .def_readwrite("dt", &State::dt)
                 .def_readwrite("padding", &State::padding)
                 .def_readwrite("nextForceBuild", &State::nextForceBuild)

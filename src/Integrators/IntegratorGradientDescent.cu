@@ -75,7 +75,25 @@ void IntegratorGradientDescent::run(int numTurns, double coef)
 {
 
     basicPreRunChecks();
+
+    // basicPrepare now only handles State prepare and sending global State data to device
     basicPrepare(numTurns);
+
+    // prepare the fixes that do not require forces to be computed
+    prepareFixes(false);
+    
+    forceInitial(true);
+
+    // prepare the fixes that require forces to be computed on instantiation;
+    prepareFixes(true);
+
+    // finally, prepare barostats, thermostats, datacomputers, etc.
+    // datacomputers are prepared first, then the barostats, thermostats, etc.
+    // prior to datacomputers being prepared, we iterate over State, and the groups in simulation 
+    // collect their NDF associated with their group
+    prepareFinal();
+
+    verifyPrepared();
 
     int periodicInterval = state->periodicInterval;
 

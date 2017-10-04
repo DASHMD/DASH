@@ -918,9 +918,10 @@ void FixChargeEwald::calc_potential(cufftComplex *phi_buf){
 bool FixChargeEwald::prepareForRun() {
     virialField = GPUArrayDeviceGlobal<Virial>(1);
     setTotalQ2();
-    if ((state->boundsGPU != boundsLastOptimize)||(total_Q2!=total_Q2LastOptimize)) {
-        handleBoundsChangeInternal(true);
-    }
+
+    //TODO these values for comparison are uninitialized - we should see about this
+
+    handleBoundsChangeInternal(true);
     turnInit = state->turn;
     if (longRangeInterval != 1) {
         storedForces = GPUArrayDeviceGlobal<float4>(state->maxIdExisting+1);
@@ -931,7 +932,8 @@ bool FixChargeEwald::prepareForRun() {
         rpCentroids = GPUArrayDeviceGlobal<float4>(state->atoms.size() / state->nPerRingPoly);
     }
     setEvalWrapper();
-    return true;
+    prepared = true;
+    return prepared;
 }
 
 void FixChargeEwald::setEvalWrapper() {

@@ -76,6 +76,11 @@ inline float rsqrtf(float x)
 {
     return 1.0f / sqrtf(x);
 }
+
+inline double rsqrt(double x)
+{
+    return 1.0 / sqrt(x);
+}
 #endif
 
 inline __host__ __device__ float cu_abs(float x) {
@@ -100,6 +105,23 @@ inline __host__ __device__ float2 make_float2(int2 a)
 inline __host__ __device__ float2 make_float2(uint2 a)
 {
     return make_float2(float(a.x), float(a.y));
+}
+
+inline __host__ __device__ double2 make_double2(double s)
+{
+    return make_double2(s, s);
+}
+inline __host__ __device__ double2 make_double2(double3 a)
+{
+    return make_double2(a.x, a.y);
+}
+inline __host__ __device__ double2 make_double2(int2 a)
+{
+    return make_double2(double(a.x), double(a.y));
+}
+inline __host__ __device__ double2 make_double2(uint2 a)
+{
+    return make_double2(double(a.x), double(a.y));
 }
 
 inline __host__ __device__ int2 make_int2(int s)
@@ -155,6 +177,53 @@ inline __host__ __device__ float3 make_float3(int3 a)
 inline __host__ __device__ float3 make_float3(uint3 a)
 {
     return make_float3(float(a.x), float(a.y), float(a.z));
+}
+
+inline __host__ __device__ float3 make_float3(double3 a)
+{
+    return make_float3(float(a.x), float(a.y), float(a.z));
+}
+
+
+
+//TODO: check these! copied float3 and did :%s/float3/double3/gc
+inline __host__ __device__ double3 make_double3(double s)
+{
+    return make_double3(s, s, s);
+}
+inline __host__ __device__ double3 make_double3(double2 a)
+{
+    return make_double3(a.x, a.y, 0.0f);
+}
+inline __host__ __device__ double3 make_double3(double2 a, double s)
+{
+    return make_double3(a.x, a.y, s);
+}
+inline __host__ __device__ double3 make_double3(double4 a)
+{
+    return make_double3(a.x, a.y, a.z);
+}
+inline __host__ __device__ double3 make_double3(int3 a)
+{
+    return make_double3(double(a.x), double(a.y), double(a.z));
+}
+inline __host__ __device__ double3 make_double3(uint3 a)
+{
+    return make_double3(double(a.x), double(a.y), double(a.z));
+}
+inline __host__ __device__ double3 make_double3(float3 a)
+{
+    return make_double3(double(a.x), double(a.y), double(a.z));
+}
+/*
+inline __host__ __device__ double3 make_double3(float a, float b, float c)
+{
+    return make_double3(double(a), double(b), double(c));
+}
+*/
+inline __host__ __device__ double3 make_double3(float4 a)
+{
+    return make_double3(double(a.x), double(a.y), double(a.z));
 }
 
 inline __host__ __device__ int3 make_int3(int s)
@@ -225,6 +294,38 @@ inline __host__ __device__ float4 make_float4(uint4 a)
 {
     return make_float4(float(a.x), float(a.y), float(a.z), float(a.w));
 }
+inline __host__ __device__ float4 make_float4(double4 a)
+{
+    return make_float4(float(a.x), float(a.y), float(a.z), float(a.w));
+}
+
+//TODO: double check these! copied make_float4 & :%s/float4/double4/gc
+inline __host__ __device__ double4 make_double4(double s)
+{
+    return make_double4(s, s, s, s);
+}
+inline __host__ __device__ double4 make_double4(double3 a)
+{
+    return make_double4(a.x, a.y, a.z, 0.0f);
+}
+inline __host__ __device__ double4 make_double4(double3 a, double w)
+{
+    return make_double4(a.x, a.y, a.z, w);
+}
+inline __host__ __device__ double4 make_double4(int4 a)
+{
+    return make_double4(double(a.x), double(a.y), double(a.z), double(a.w));
+}
+inline __host__ __device__ double4 make_double4(uint4 a)
+{
+    return make_double4(double(a.x), double(a.y), double(a.z), double(a.w));
+}
+inline __host__ __device__ double4 make_double4(float4 a)
+{
+    return make_double4(double(a.x), double(a.y), double(a.z), double(a.w));
+}
+
+
 inline __host__ __device__ int4 make_int4(int s)
 {
     return make_int4(s, s, s, s);
@@ -272,6 +373,12 @@ inline __host__ __device__ float2 operator-(float2 &a)
 {
     return make_float2(-a.x, -a.y);
 }
+
+inline __host__ __device__ double2 operator-(double2 &a)
+{
+    return make_double2(-a.x, -a.y);
+}
+
 inline __host__ __device__ int2 operator-(int2 &a)
 {
     return make_int2(-a.x, -a.y);
@@ -279,6 +386,11 @@ inline __host__ __device__ int2 operator-(int2 &a)
 inline __host__ __device__ float3 operator-(float3 &a)
 {
     return make_float3(-a.x, -a.y, -a.z);
+}
+
+inline __host__ __device__ double3 operator-(double3 &a)
+{
+    return make_double3(-a.x, -a.y, -a.z);
 }
 inline __host__ __device__ int3 operator-(int3 &a)
 {
@@ -288,6 +400,12 @@ inline __host__ __device__ float4 operator-(float4 &a)
 {
     return make_float4(-a.x, -a.y, -a.z, -a.w);
 }
+
+inline __host__ __device__ double4 operator-(double4 &a)
+{
+    return make_double4(-a.x, -a.y, -a.z, -a.w);
+}
+
 inline __host__ __device__ int4 operator-(int4 &a)
 {
     return make_int4(-a.x, -a.y, -a.z, -a.w);
@@ -318,6 +436,26 @@ inline __host__ __device__ void operator+=(float2 &a, float b)
     a.x += b; a.y += b;
 }
 
+inline __host__ __device__ double2 operator+(double2 a, double2 b)
+{
+    return make_double2(a.x + b.x, a.y + b.y);
+}
+inline __host__ __device__ void operator+=(double2 &a, double2 b)
+{
+    a.x += b.x; a.y += b.y;
+}
+inline __host__ __device__ double2 operator+(double2 a, double b)
+{
+    return make_double2(a.x + b, a.y + b);
+}
+inline __host__ __device__ double2 operator+(double b, double2 a)
+{
+    return make_double2(a.x + b, a.y + b);
+}
+inline __host__ __device__ void operator+=(double2 &a, double b)
+{
+    a.x += b; a.y += b;
+}
 inline __host__ __device__ int2 operator+(int2 a, int2 b)
 {
     return make_int2(a.x + b.x, a.y + b.y);
@@ -378,6 +516,22 @@ inline __host__ __device__ void operator+=(float3 &a, float b)
     a.x += b; a.y += b; a.z += b;
 }
 
+inline __host__ __device__ double3 operator+(double3 a, double3 b)
+{
+    return make_double3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+inline __host__ __device__ void operator+=(double3 &a, double3 b)
+{
+    a.x += b.x; a.y += b.y; a.z += b.z;
+}
+inline __host__ __device__ double3 operator+(double3 a, double b)
+{
+    return make_double3(a.x + b, a.y + b, a.z + b);
+}
+inline __host__ __device__ void operator+=(double3 &a, double b)
+{
+    a.x += b; a.y += b; a.z += b;
+}
 inline __host__ __device__ int3 operator+(int3 a, int3 b)
 {
     return make_int3(a.x + b.x, a.y + b.y, a.z + b.z);
@@ -460,11 +614,60 @@ inline __host__ __device__ void operator+=(float4 &a, float3 &b)
     a.x += b.x; a.y += b.y; a.z += b.z;
 }
 
+inline __host__ __device__ void operator+=(float4 &a, double3 b)
+{
+    a.x += float(b.x); a.y += float(b.y); a.z += float(b.z);
+}
 inline __host__ __device__ void operator+=(float4 &a, float b)
 {
     a.x += b; a.y += b; a.z += b; a.w += b;
 }
 
+
+inline __host__ __device__ double3 operator+(double b, double3 a)
+{
+    return make_double3(a.x + b, a.y + b, a.z + b);
+}
+
+inline __host__ __device__ double4 operator+(double4 a, double4 b)
+{
+    return make_double4(a.x + b.x, a.y + b.y, a.z + b.z,  a.w + b.w);
+}
+inline __host__ __device__ void operator+=(double4 &a, double4 b)
+{
+    a.x += b.x; a.y += b.y; a.z += b.z; a.w += b.w;
+}
+inline __host__ __device__ double4 operator+(double4 a, double b)
+{
+    return make_double4(a.x + b, a.y + b, a.z + b, a.w + b);
+}
+inline __host__ __device__ double4 operator+(double b, double4 a)
+{
+    return make_double4(a.x + b, a.y + b, a.z + b, a.w + b);
+}
+
+inline __host__ __device__ double4 operator+(double4 a, double3 b)
+{
+    return make_double4(a.x + b.x, a.y + b.y, a.z + b.z, a.w);
+}
+inline __host__ __device__ double4 operator-(double4 a, double3 b)
+{
+    return make_double4(a.x - b.x, a.y - b.y, a.z - b.z, a.w);
+}
+inline __host__ __device__ double4 operator+(double3 a, double4 b)
+{
+    return make_double4(a.x + b.x, a.y + b.y, a.z + b.z, b.w);
+}
+
+inline __host__ __device__ void operator+=(double4 &a, double3 &b)
+{
+    a.x += b.x; a.y += b.y; a.z += b.z;
+}
+
+inline __host__ __device__ void operator+=(double4 &a, double b)
+{
+    a.x += b; a.y += b; a.z += b; a.w += b;
+}
 inline __host__ __device__ int4 operator+(int4 a, int4 b)
 {
     return make_int4(a.x + b.x, a.y + b.y, a.z + b.z,  a.w + b.w);
@@ -532,6 +735,27 @@ inline __host__ __device__ void operator-=(float2 &a, float b)
     a.x -= b; a.y -= b;
 }
 
+
+inline __host__ __device__ double2 operator-(double2 a, double2 b)
+{
+    return make_double2(a.x - b.x, a.y - b.y);
+}
+inline __host__ __device__ void operator-=(double2 &a, double2 b)
+{
+    a.x -= b.x; a.y -= b.y;
+}
+inline __host__ __device__ double2 operator-(double2 a, double b)
+{
+    return make_double2(a.x - b, a.y - b);
+}
+inline __host__ __device__ double2 operator-(double b, double2 a)
+{
+    return make_double2(b - a.x, b - a.y);
+}
+inline __host__ __device__ void operator-=(double2 &a, double b)
+{
+    a.x -= b; a.y -= b;
+}
 inline __host__ __device__ int2 operator-(int2 a, int2 b)
 {
     return make_int2(a.x - b.x, a.y - b.y);
@@ -595,6 +819,26 @@ inline __host__ __device__ void operator-=(float3 &a, float b)
     a.x -= b; a.y -= b; a.z -= b;
 }
 
+inline __host__ __device__ double3 operator-(double3 a, double3 b)
+{
+    return make_double3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+inline __host__ __device__ void operator-=(double3 &a, double3 b)
+{
+    a.x -= b.x; a.y -= b.y; a.z -= b.z;
+}
+inline __host__ __device__ double3 operator-(double3 a, double b)
+{
+    return make_double3(a.x - b, a.y - b, a.z - b);
+}
+inline __host__ __device__ double3 operator-(double b, double3 a)
+{
+    return make_double3(b - a.x, b - a.y, b - a.z);
+}
+inline __host__ __device__ void operator-=(double3 &a, double b)
+{
+    a.x -= b; a.y -= b; a.z -= b;
+}
 inline __host__ __device__ int3 operator-(int3 a, int3 b)
 {
     return make_int3(a.x - b.x, a.y - b.y, a.z - b.z);
@@ -650,6 +894,24 @@ inline __host__ __device__ float4 operator-(float4 a, float b)
     return make_float4(a.x - b, a.y - b, a.z - b,  a.w - b);
 }
 inline __host__ __device__ void operator-=(float4 &a, float b)
+{
+    a.x -= b; a.y -= b; a.z -= b; a.w -= b;
+}
+
+
+inline __host__ __device__ double4 operator-(double4 a, double4 b)
+{
+    return make_double4(a.x - b.x, a.y - b.y, a.z - b.z,  a.w - b.w);
+}
+inline __host__ __device__ void operator-=(double4 &a, double4 b)
+{
+    a.x -= b.x; a.y -= b.y; a.z -= b.z; a.w -= b.w;
+}
+inline __host__ __device__ double4 operator-(double4 a, double b)
+{
+    return make_double4(a.x - b, a.y - b, a.z - b,  a.w - b);
+}
+inline __host__ __device__ void operator-=(double4 &a, double b)
 {
     a.x -= b; a.y -= b; a.z -= b; a.w -= b;
 }
@@ -721,6 +983,27 @@ inline __host__ __device__ void operator*=(float2 &a, float b)
     a.x *= b; a.y *= b;
 }
 
+
+inline __host__ __device__ double2 operator*(double2 a, double2 b)
+{
+    return make_double2(a.x * b.x, a.y * b.y);
+}
+inline __host__ __device__ void operator*=(double2 &a, double2 b)
+{
+    a.x *= b.x; a.y *= b.y;
+}
+inline __host__ __device__ double2 operator*(double2 a, double b)
+{
+    return make_double2(a.x * b, a.y * b);
+}
+inline __host__ __device__ double2 operator*(double b, double2 a)
+{
+    return make_double2(b * a.x, b * a.y);
+}
+inline __host__ __device__ void operator*=(double2 &a, double b)
+{
+    a.x *= b; a.y *= b;
+}
 inline __host__ __device__ int2 operator*(int2 a, int2 b)
 {
     return make_int2(a.x * b.x, a.y * b.y);
@@ -784,6 +1067,27 @@ inline __host__ __device__ void operator*=(float3 &a, float b)
     a.x *= b; a.y *= b; a.z *= b;
 }
 
+
+inline __host__ __device__ double3 operator*(double3 a, double3 b)
+{
+    return make_double3(a.x * b.x, a.y * b.y, a.z * b.z);
+}
+inline __host__ __device__ void operator*=(double3 &a, double3 b)
+{
+    a.x *= b.x; a.y *= b.y; a.z *= b.z;
+}
+inline __host__ __device__ double3 operator*(double3 a, double b)
+{
+    return make_double3(a.x * b, a.y * b, a.z * b);
+}
+inline __host__ __device__ double3 operator*(double b, double3 a)
+{
+    return make_double3(b * a.x, b * a.y, b * a.z);
+}
+inline __host__ __device__ void operator*=(double3 &a, double b)
+{
+    a.x *= b; a.y *= b; a.z *= b;
+}
 inline __host__ __device__ int3 operator*(int3 a, int3 b)
 {
     return make_int3(a.x * b.x, a.y * b.y, a.z * b.z);
@@ -847,6 +1151,27 @@ inline __host__ __device__ void operator*=(float4 &a, float b)
     a.x *= b; a.y *= b; a.z *= b; a.w *= b;
 }
 
+
+inline __host__ __device__ double4 operator*(double4 a, double4 b)
+{
+    return make_double4(a.x * b.x, a.y * b.y, a.z * b.z,  a.w * b.w);
+}
+inline __host__ __device__ void operator*=(double4 &a, double4 b)
+{
+    a.x *= b.x; a.y *= b.y; a.z *= b.z; a.w *= b.w;
+}
+inline __host__ __device__ double4 operator*(double4 a, double b)
+{
+    return make_double4(a.x * b, a.y * b, a.z * b,  a.w * b);
+}
+inline __host__ __device__ double4 operator*(double b, double4 a)
+{
+    return make_double4(b * a.x, b * a.y, b * a.z, b * a.w);
+}
+inline __host__ __device__ void operator*=(double4 &a, double b)
+{
+    a.x *= b; a.y *= b; a.z *= b; a.w *= b;
+}
 inline __host__ __device__ int4 operator*(int4 a, int4 b)
 {
     return make_int4(a.x * b.x, a.y * b.y, a.z * b.z,  a.w * b.w);
@@ -955,6 +1280,68 @@ inline __host__ __device__ float4 operator/(float b, float4 a){
     return make_float4(b / a.x, b / a.y, b / a.z, b / a.w);
 }
 
+
+inline __host__ __device__ double2 operator/(double2 a, double2 b)
+{
+    return make_double2(a.x / b.x, a.y / b.y);
+}
+inline __host__ __device__ void operator/=(double2 &a, double2 b)
+{
+    a.x /= b.x; a.y /= b.y;
+}
+inline __host__ __device__ double2 operator/(double2 a, double b)
+{
+    return make_double2(a.x / b, a.y / b);
+}
+inline __host__ __device__ void operator/=(double2 &a, double b)
+{
+    a.x /= b; a.y /= b;
+}
+inline __host__ __device__ double2 operator/(double b, double2 a)
+{
+    return make_double2(b / a.x, b / a.y);
+}
+
+inline __host__ __device__ double3 operator/(double3 a, double3 b)
+{
+    return make_double3(a.x / b.x, a.y / b.y, a.z / b.z);
+}
+inline __host__ __device__ void operator/=(double3 &a, double3 b)
+{
+    a.x /= b.x; a.y /= b.y; a.z /= b.z;
+}
+inline __host__ __device__ double3 operator/(double3 a, double b)
+{
+    return make_double3(a.x / b, a.y / b, a.z / b);
+}
+inline __host__ __device__ void operator/=(double3 &a, double b)
+{
+    a.x /= b; a.y /= b; a.z /= b;
+}
+inline __host__ __device__ double3 operator/(double b, double3 a)
+{
+    return make_double3(b / a.x, b / a.y, b / a.z);
+}
+
+inline __host__ __device__ double4 operator/(double4 a, double4 b)
+{
+    return make_double4(a.x / b.x, a.y / b.y, a.z / b.z,  a.w / b.w);
+}
+inline __host__ __device__ void operator/=(double4 &a, double4 b)
+{
+    a.x /= b.x; a.y /= b.y; a.z /= b.z; a.w /= b.w;
+}
+inline __host__ __device__ double4 operator/(double4 a, double b)
+{
+    return make_double4(a.x / b, a.y / b, a.z / b,  a.w / b);
+}
+inline __host__ __device__ void operator/=(double4 &a, double b)
+{
+    a.x /= b; a.y /= b; a.z /= b; a.w /= b;
+}
+inline __host__ __device__ double4 operator/(double b, double4 a){
+    return make_double4(b / a.x, b / a.y, b / a.z, b / a.w);
+}
 ////////////////////////////////////////////////////////////////////////////////
 // min
 ////////////////////////////////////////////////////////////////////////////////
@@ -1173,6 +1560,18 @@ inline __host__ __device__ float dot(float4 a, float4 b)
     return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 }
 
+inline __host__ __device__ double dot(double2 a, double2 b)
+{ 
+    return a.x * b.x + a.y * b.y;
+}
+inline __host__ __device__ double dot(double3 a, double3 b)
+{ 
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+inline __host__ __device__ double dot(double4 a, double4 b)
+{ 
+    return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+}
 inline __host__ __device__ int dot(int2 a, int2 b)
 { 
     return a.x * b.x + a.y * b.y;
@@ -1240,6 +1639,28 @@ inline __host__ __device__ float Sqr(float v)
     return v*v;
 }
 
+
+inline __host__ __device__ double length(double2 v)
+{
+    return sqrt(dot(v, v));
+}
+inline __host__ __device__ double length(double3 v)
+{
+    return sqrt(dot(v, v));
+}
+inline __host__ __device__ double length(double4 v)
+{
+    return sqrt(dot(v, v));
+}
+
+inline __host__ __device__ double lengthSqr(double3 v)
+{
+    return dot(v, v);
+}
+inline __host__ __device__ double lengthSqr(double4 v)
+{
+    return dot(v, v);
+}
 ////////////////////////////////////////////////////////////////////////////////
 // normalize
 ////////////////////////////////////////////////////////////////////////////////
@@ -1260,6 +1681,22 @@ inline __host__ __device__ float4 normalize(float4 v)
     return v * invLen;
 }
 
+
+inline __host__ __device__ double2 normalize(double2 v)
+{
+    double invLen = rsqrt(dot(v, v));
+    return v * invLen;
+}
+inline __host__ __device__ double3 normalize(double3 v)
+{
+    double invLen = rsqrt(dot(v, v));
+    return v * invLen;
+}
+inline __host__ __device__ double4 normalize(double4 v)
+{
+    double invLen = rsqrt(dot(v, v));
+    return v * invLen;
+}
 ////////////////////////////////////////////////////////////////////////////////
 // floor
 ////////////////////////////////////////////////////////////////////////////////
@@ -1365,6 +1802,10 @@ inline __host__ __device__ float3 cross(float3 a, float3 b)
     return make_float3(a.y*b.z - a.z*b.y, a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x); 
 }
 
+inline __host__ __device__ double3 cross(double3 a, double3 b)
+{
+    return make_double3(a.y*b.z - a.z*b.y, a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x); 
+}
 ////////////////////////////////////////////////////////////////////////////////
 // smoothstep
 // - returns 0 if x < a

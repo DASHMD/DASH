@@ -50,7 +50,8 @@ void FixWallHarmonic::singlePointEng(float *perParticleEng) {
 bool FixWallHarmonic::prepareForRun() {
     // set this fix's evaulator with the appropriate parameters
     evaluator = EvaluatorWallHarmonic(k, dist);
-    return true;
+    prepared = true;
+    return prepared;
 };
 
 bool FixWallHarmonic::postRun () {

@@ -76,7 +76,8 @@ bool FixLangevin::prepareForRun() {
     turnFinishRun = state->runInit + state->runningFor;
     randStates = GPUArrayDeviceGlobal<curandState_t>(state->atoms.size());
     initRandStates<<<NBLOCK(state->atoms.size()), PERBLOCK>>>(state->atoms.size(), randStates.data(), seed,state->turn);
-    return true;
+    prepared = true;
+    return prepared;
 }
 
 bool FixLangevin::postRun() {

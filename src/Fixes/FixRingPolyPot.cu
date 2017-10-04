@@ -36,6 +36,12 @@ void __global__ compute_RP_energy_cu(int nAtoms, int nPerRingPoly, float omegaP,
     
 }
 
+bool FixRingPolyPot::prepareForRun() {
+    Fix::prepareForRun();
+    prepared = true;
+    return prepared;
+}
+
 void FixRingPolyPot::singlePointEng(float *perParticleEng) {
         GPUData &gpd    = state->gpd;
         int activeIdx   = gpd.activeIdx();

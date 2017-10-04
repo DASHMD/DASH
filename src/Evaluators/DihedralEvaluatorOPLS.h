@@ -19,6 +19,22 @@ class DihedralEvaluatorOPLS {
                     )
                 ;
         }
+
+
+        // 
+        inline __device__ double dPotential(DihedralOPLSType dihedralType, double phi) {
+    //LAMMPS pre-multiplies all of its coefs by 0.5.  We're doing it in the kernel.
+            return -0.5 * (
+                    double(dihedralType.coefs[0]) * sin(phi)
+                    - 2.0f * double(dihedralType.coefs[1]) * sin(2.0f*phi) 
+                    + 3.0f * double(dihedralType.coefs[2]) * sin(3.0f*phi)
+                    - 4.0f * double(dihedralType.coefs[3]) * sin(4.0f*phi)
+                    )
+                ;
+        }
+
+
+
         inline __device__ float potential(DihedralOPLSType dihedralType, float phi) {
             return  0.5 * (
                            dihedralType.coefs[0] * (1.0f + cosf(phi))

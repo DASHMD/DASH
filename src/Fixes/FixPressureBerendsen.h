@@ -11,7 +11,8 @@ namespace MD_ENGINE {
     public: 
         FixPressureBerendsen(boost::shared_ptr<State> state_, std::string handle_, double pressure_, double period_, int applyEvery_);
 
-        bool prepareForRun();
+        //bool prepareForRun();
+        bool prepareFinal();
         bool stepFinal();
         bool postRun();
         DataComputerPressure pressureComputer;

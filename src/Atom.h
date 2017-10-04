@@ -23,16 +23,19 @@ public:
     double q;
     int type;  
     int id;
+    int ndf;
     uint32_t groupTag;
     bool isChanged;
     std::vector<std::string> *handles;
+   
+    // ndf associated with this individual atom
 
     Atom (std::vector<std::string> *handles_) 
-        : mass(0), type(-1), id(-1), handles(handles_)
+        : mass(0), type(-1), id(-1), ndf(3), handles(handles_)
     {};
     Atom(Vector pos_, int type_, int id_, double mass_, double q_, std::vector<std::string> *handles_)
-        : pos(pos_), mass(mass_), q(q_), type(type_), id(id_), groupTag(1), handles(handles_)
-    {   }
+        : pos(pos_), mass(mass_), q(q_), type(type_), id(id_), ndf(3),groupTag(1), handles(handles_)
+    {};
 
     bool operator==(const Atom &other) {
         return id == other.id;
@@ -55,6 +58,10 @@ public:
     Vector getForce();
 
     std::string getType();
+
+    void setNDF(int n);
+
+    int getNDF();
 
     void setBeadPos(int n, int nPerRingPoly, std::vector<Vector> &xsNM);
     // displaces the position of a bead based on free ring-polymer distribution

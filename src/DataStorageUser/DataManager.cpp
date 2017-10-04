@@ -5,7 +5,9 @@
 #include "DataComputerEnergy.h"
 #include "DataComputerPressure.h"
 #include "DataComputerBounds.h"
+#include "DataComputerCOMV.h"
 #include "DataComputerDipolarCoupling.h"
+#include "DataComputerEField.h"
 #include "DataSetUser.h"
 using namespace MD_ENGINE;
 using std::set;
@@ -89,8 +91,15 @@ boost::shared_ptr<DataSetUser> DataManager::recordBounds(int interval, py::objec
     dataSets.push_back(dataSet);
     return dataSet;
 
+}
 
-
+boost::shared_ptr<DataSetUser> DataManager::recordCOMV(int interval, py::object collectGenerator) {
+    int dataType = DATATYPE::COMV;
+    boost::shared_ptr<DataComputer> comp = boost::shared_ptr<DataComputer>( (DataComputer *) new DataComputerCOMV(state) );
+    uint32_t groupTag = 1;
+    boost::shared_ptr<DataSetUser> dataSet = createDataSet(comp, groupTag, interval, collectGenerator);
+    dataSets.push_back(dataSet);
+    return dataSet;
 
 }
 
@@ -107,6 +116,16 @@ boost::shared_ptr<MD_ENGINE::DataSetUser> DataManager::recordDipolarCoupling(std
     return dataSet;
 
 
+}
+
+
+boost::shared_ptr<MD_ENGINE::DataSetUser> DataManager::recordEField(double cutoff, int interval, boost::python::object collectGenerator) {
+    int dataType = DATATYPE::EFIELD;
+    boost::shared_ptr<DataComputer> comp = boost::shared_ptr<DataComputer> ( (DataComputer *) new DataComputerEField(state, cutoff));
+    boost::shared_ptr<DataSetUser> dataSet = createDataSet(comp, 1, interval, collectGenerator);
+    dataSets.push_back(dataSet);
+    return dataSet;
+   
 }
 void DataManager::addVirialTurn(int64_t t, bool perAtomVirials) {
     if (perAtomVirials) {
@@ -186,6 +205,10 @@ void export_DataManager() {
             (py::arg("interval") = 0,
              py::arg("collectGenerator") = py::object())
         )
+    .def("recordCOMV", &DataManager::recordCOMV,
+         (py::arg("interval") = 0,
+          py::arg("collectGenerator") = py::object())
+        )
     .def("recordDipolarCoupling", &DataManager::recordDipolarCoupling,
             (py::arg("handleA"),
              py::arg("handleB"),
@@ -194,6 +217,11 @@ void export_DataManager() {
              py::arg("mode") = "scalar",
              py::arg("interval") = 0,
              py::arg("collectGenerator") = py::object())
+        )
+    .def("recordEField", &DataManager::recordEField,
+            ( py::arg("cutoff"),
+            py::arg("interval") = 0,
+            py::arg("collectGenerator") = py::object())
         )
 
 //boost::shared_ptr<MD_ENGINE::DataSetUser> DataManager::recordDipolarCoupling(std::string groupHandle, std::string computeMode, std::string groupHandleB, double magnetoA, double magnetoB, int interval, boost::python::object collectGenerator) {

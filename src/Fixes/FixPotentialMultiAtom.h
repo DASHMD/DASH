@@ -72,7 +72,8 @@ class FixPotentialMultiAtom : public Fix, public TypedItemHolder {
 
 
             setSharedMemForParams(); 
-            return true;
+            prepared = true;
+            return prepared;
         } 
         void setForcerType(int n, CPUMember &forcer) {
             if (n < 0) {

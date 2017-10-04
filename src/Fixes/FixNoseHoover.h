@@ -54,7 +54,8 @@ public:
                   std::string groupHandle);
 
     //! Prepare Nose-Hoover thermostat for simulation run
-    bool prepareForRun();
+    bool prepareFinal();
+    //bool prepareForRun();
 
     //! Perform post-Run operations
     bool postRun();

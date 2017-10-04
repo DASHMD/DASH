@@ -11,11 +11,16 @@ FixPressureBerendsen::FixPressureBerendsen(boost::shared_ptr<State> state_, std:
     requiresPerAtomVirials=true;
 };
 
-bool FixPressureBerendsen::prepareForRun() {
+bool FixPressureBerendsen::prepareFinal() {
     turnBeginRun = state->runInit;
     turnFinishRun = state->runInit + state->runningFor;
     pressureComputer.prepareForRun(); 
-    return true;
+
+    // get rigid bodies, if any, in simulation
+    state->findRigidBodies();
+
+    prepared = true;
+    return prepared;
 }
 
 bool FixPressureBerendsen::stepFinal() {
@@ -33,7 +38,9 @@ bool FixPressureBerendsen::stepFinal() {
     } else if (dilation > dilationUpper) {
         dilation = dilationUpper;
     }
+
     Mod::scaleSystem(state, make_float3(dilation, dilation, dilation));
+
     return true;
 }
 

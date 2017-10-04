@@ -16,6 +16,21 @@ public:
         } 
         return make_float3(0, 0, 0);
     }
+
+
+    // double precision
+    inline __device__ double3 force(double3 bondVec, double rSqr, BondHarmonicType bondType) {
+        double r = sqrt(rSqr);
+        double dr = r - double(bondType.r0);
+        double rk = bondType.k * dr;
+        if (r > 0) {//MAKE SURE ALL THIS WORKS, I JUST BORROWED FROM LAMMPS
+            double fBond = -rk/r;
+            return bondVec * fBond;
+        } 
+        return make_double3(0, 0, 0);
+    }
+
+
     inline __device__ float energy(float3 bondVec, float rSqr, BondHarmonicType bondType) {
         float r = sqrtf(rSqr);
         float dr = r - bondType.r0;

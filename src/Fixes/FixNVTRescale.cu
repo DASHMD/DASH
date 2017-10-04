@@ -30,8 +30,16 @@ using namespace std;
 const std::string NVTRescaleType = "NVTRescale";
 
 
-FixNVTRescale::FixNVTRescale(SHARED(State) state_, string handle_, string groupHandle_, py::list intervals_, py::list temps_, int applyEvery_)
-    : Interpolator(intervals_, temps_), Fix(state_, handle_, groupHandle_, NVTRescaleType, false, false, false, applyEvery_),
+FixNVTRescale::FixNVTRescale(SHARED(State) state_, string handle_, string groupHandle_, py::list intervals_, py::list temps_, int applyEvery_, int orderPreference_)
+    : Interpolator(intervals_, temps_), Fix(state_, handle_, groupHandle_, NVTRescaleType, false, false, false, applyEvery_, orderPreference_),
+      curIdx(0), tempComputer(state, "scalar")
+{
+    isThermostat = true;
+
+}
+
+FixNVTRescale::FixNVTRescale(SHARED(State) state_, string handle_, string groupHandle_, py::object tempFunc_, int applyEvery_, int orderPreference_)
+    : Interpolator(tempFunc_), Fix(state_, handle_, groupHandle_, NVTRescaleType, false, false, false, applyEvery_, orderPreference_),
       curIdx(0), tempComputer(state, "scalar")
 {
     isThermostat = true;
@@ -39,17 +47,8 @@ FixNVTRescale::FixNVTRescale(SHARED(State) state_, string handle_, string groupH
 
 }
 
-FixNVTRescale::FixNVTRescale(SHARED(State) state_, string handle_, string groupHandle_, py::object tempFunc_, int applyEvery_)
-    : Interpolator(tempFunc_), Fix(state_, handle_, groupHandle_, NVTRescaleType, false, false, false, applyEvery_),
-      curIdx(0), tempComputer(state, "scalar")
-{
-    isThermostat = true;
-
-
-}
-
-FixNVTRescale::FixNVTRescale(SHARED(State) state_, string handle_, string groupHandle_, double constTemp_, int applyEvery_)
-    : Interpolator(constTemp_), Fix(state_, handle_, groupHandle_, NVTRescaleType, false, false, false, applyEvery_),
+FixNVTRescale::FixNVTRescale(SHARED(State) state_, string handle_, string groupHandle_, double constTemp_, int applyEvery_, int orderPreference_)
+    : Interpolator(constTemp_), Fix(state_, handle_, groupHandle_, NVTRescaleType, false, false, false, applyEvery_, orderPreference_),
       curIdx(0), tempComputer(state, "scalar")
 {
     isThermostat = true;
@@ -60,11 +59,13 @@ FixNVTRescale::FixNVTRescale(SHARED(State) state_, string handle_, string groupH
 
 
 
-bool FixNVTRescale::prepareForRun() {
+bool FixNVTRescale::prepareFinal() {
     turnBeginRun = state->runInit;
     turnFinishRun = state->runInit + state->runningFor;
+    tempComputer = MD_ENGINE::DataComputerTemperature(state,"scalar");
     tempComputer.prepareForRun();
-    return true;
+    prepared = true;
+    return prepared;
 }
 
 void __global__ rescale(int nAtoms, uint groupTag, float4 *vs, float4 *fs, float tempSet, float tempCur) {
@@ -85,8 +86,8 @@ void __global__ rescale(int nAtoms, uint groupTag, float4 *vs, float4 *fs, float
 
 
 
-void FixNVTRescale::compute(int virialMode) {
-
+//void FixNVTRescale::compute(int virialMode) {
+bool FixNVTRescale::stepFinal() {
     tempComputer.computeScalar_GPU(true, groupTag);
     int nAtoms = state->atoms.size();
     int64_t turn = state->turn;
@@ -98,6 +99,8 @@ void FixNVTRescale::compute(int virialMode) {
     cudaDeviceSynchronize();
     tempComputer.computeScalar_CPU();
     rescale<<<NBLOCK(nAtoms), PERBLOCK>>>(nAtoms, groupTag, gpd.vs(activeIdx), gpd.fs(activeIdx), temp, tempComputer.tempScalar);
+
+    return true;
 }
 
 

@@ -38,9 +38,6 @@ private:
      */
     void preForce();
     
-    // BPK
-    //void printConfig();
-    // BPK END
     //
     //! Run second half-integration step
     /*!

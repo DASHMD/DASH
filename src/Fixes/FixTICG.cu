@@ -71,7 +71,8 @@ bool FixTICG::prepareForRun() {
     prepareParameters(rCutHandle, processRCut);
     sendAllToDevice();
     setEvalWrapper();
-    return true;
+    prepared = true;
+    return prepared;
 }
 
 void FixTICG::setEvalWrapper() {

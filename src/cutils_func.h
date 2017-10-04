@@ -30,7 +30,8 @@ inline __device__ int baseNeighlistIdxFromRPIndex(const uint32_t *cumulSumMaxMem
     int warpsPerBlock           = blockDim.x/warpSize;
     return warpsPerBlock * cumulSumUpToMe + memSizePerWarpMe * myWarp + myIdxInWarp * nThreadPerAtom;
 }
-inline __device__ int baseNeighlistIdxFromRPIndex(const uint32_t *cumulSumMaxMemPerWarp, int warpSize, int myRingPolyIdx) { 
+
+inline __device__ int baseNeighlistIdxFromRPIndex(const uint32_t *cumulSumMaxMemPerWarp, int warpSize, int myRingPolyIdx) {
     int      blockIdx           = myRingPolyIdx / blockDim.x;
     uint32_t cumulSumUpToMe     = cumulSumMaxMemPerWarp[blockIdx];
     uint32_t memSizePerWarpMe   = cumulSumMaxMemPerWarp[blockIdx+1] - cumulSumUpToMe;
@@ -50,9 +51,8 @@ inline __device__ int baseNeighlistIdxFromRPIndex(const uint32_t *cumulSumMaxMem
     int warpsPerBlock = blockDim.x/warpSize;
     return warpsPerBlock * cumulSumUpToMe + memSizePerWarpMe * myWarp + myIdxInWarp;
 }
-
 */
-inline __device__ int baseNeighlistIdxFromIndex(uint32_t *cumulSumMaxPerBlock, int warpSize, int idx) {
+inline __device__ int baseNeighlistIdxFromIndex(const uint32_t *cumulSumMaxPerBlock, int warpSize, int idx) {
     int blockIdx = idx / blockDim.x;
     int warpIdx = (idx - blockIdx * blockDim.x) / warpSize;
     int idxInWarp = idx - blockIdx * blockDim.x - warpIdx * warpSize;
@@ -190,10 +190,10 @@ ACCUMULATION_CLASS(SumVectorSqr3DOverW, float, float4, v, lengthSqrOverW(v), 0);
 ACCUMULATION_CLASS(SumVectorXYZOverW, float4, float4, v, xyzOverW(v), make_float4(0, 0, 0, 0)); //for linear momentum
 //opt by precomputing 1/w.  probably trivial speedup
 ACCUMULATION_CLASS(SumVectorToVirial, Virial, float4, v, Virial(v.x*v.x, v.y*v.y, v.z*v.z, v.x*v.y, v.x*v.z, v.y*v.z), Virial(0, 0, 0, 0, 0, 0)); 
+
+/* TODO: this is the line giving grief for massless particles! */
 ACCUMULATION_CLASS(SumVectorToVirialOverW, Virial, float4, v, Virial(v.x*v.x/v.w, v.y*v.y/v.w, v.z*v.z/v.w, v.x*v.y/v.w, v.x*v.z/v.w, v.y*v.z/v.w), Virial(0, 0, 0, 0, 0, 0)); 
 ACCUMULATION_CLASS(SumVirialToScalar, float, Virial, vir, (vir[0]+vir[1]+vir[2]), 0); 
-
-
 
 template <class K, class T, class C, int NPERTHREAD>
 __global__ void oneToOne_gpu(K *dest, T *src, int n, C instance) {
@@ -249,8 +249,8 @@ __global__ void accumulate_gpu(K *dest, T *src, int n, int warpSize, C instance)
         atomicAdd(destFloat + threadIdx.x, tmpFloat[threadIdx.x]);
     }
 }
-//dealing with the common case of summing based on group tags
 
+//dealing with the common case of summing based on group tags
 template <class K, class T, class C, int NPERTHREAD>
 __global__ void accumulate_gpu_if(K *dest, T *src, int n, int warpSize, C instance) {
     SharedMemory<K> sharedMem;

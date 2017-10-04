@@ -40,7 +40,6 @@ class Virial {
                 vals[i] *= x;
             }
         } 
-
         /*
         float operator[] (int n) { //for python interface
             if (n > 0 and n < 6) {

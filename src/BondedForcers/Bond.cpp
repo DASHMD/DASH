@@ -86,13 +86,21 @@ BondQuartic::BondQuartic(double k2_, double k3_, double k4_, double r0_, int typ
 
 std::string BondQuarticType::getInfoString() {
   std::stringstream ss;
-  ss << " k2='" << k2 << " k3='" << k3 << " k4='" << k4 << "' r0='" << r0;
+  ss << " k2='" << k2 << "\' k3='" << k3 << "\' k4='" << k4 << "' r0='" << r0;
   return ss.str();
 }
 
 std::string BondQuartic::getInfoString() {
   std::stringstream ss;
-  ss << "<member type='" << type << " k2='" << k2 << " k3='" << k3 << " k4='" << k4 << "' r0='" << r0 << "' atomID_a='" << ids[0] <<  "' atomID_b='" << ids[1] << "'/>\n";
+  ss << "<member type=\'" << type << "\' ";
+  ss << " k2=\'" << k2 << "\' ";
+  ss << " k3=\'" << k3 << "\' ";
+  ss << " k4=\'" << k4 << "\' ";
+  ss << " r0=\'" << r0 << "\' ";
+  ss << " atomID_a=\'" << ids[0] << "\'";
+  ss << " atomID_b=\'" << ids[1] << "\' ";
+  ss << "/>\n";
+  //ss << "<member type='" << type << "\' \'k2='" << k2 << "\' k3='" << k3 << "\' k4='" << k4 << "' r0='" << r0 << "' atomID_a='" << ids[0] <<  "' atomID_b='" << ids[1] << "'/>\n";
   return ss.str();
 }
 

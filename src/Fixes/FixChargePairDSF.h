@@ -26,6 +26,7 @@ public:
     FixChargePairDSF(boost::shared_ptr<State> state_,
                      std::string handle_, std::string groupHandle_);
 
+    bool prepareForRun();
     void setParameters(float alpha_, float r_cut_);
     void compute(int);
     void singlePointEng(float *);

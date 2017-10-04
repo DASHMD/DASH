@@ -35,6 +35,14 @@ std::string Atom::getType() {
     return handles->at(type);
 }
 
+void Atom::setNDF(int n) {
+    ndf = n;
+}
+
+int Atom::getNDF() {
+    return ndf;
+}
+
 void Atom::setBeadPos(int n, int nPerRingPoly, std::vector<Vector> &xsNM) {
     float sqrt2           = sqrt(2.0);
     float invP            = 1.0 / (float) nPerRingPoly;
@@ -84,6 +92,7 @@ void export_Atom () {
         .def_readwrite("groupTag", &Atom::groupTag)
         .def_readwrite("mass", &Atom::mass)
         .def_readwrite("q", &Atom::q)
+        .def_readwrite("ndf",&Atom::ndf)
         .add_property("type", &Atom::getType)
         .def("kinetic", &Atom::kinetic)
         .def_readwrite("isChanged", &Atom::isChanged)

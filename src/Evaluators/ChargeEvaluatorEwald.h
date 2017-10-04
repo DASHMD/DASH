@@ -24,6 +24,26 @@ class ChargeEvaluatorEwald {
             forceScalar *= r2inv;
             return dr * forceScalar;
         }
+
+        // double precision version
+        inline __device__ double3 force(double3 dr, double lenSqr, double qi, double qj, double multiplier) {
+            if (lenSqr < 1e-10) {
+                lenSqr = 1e-10;
+            }
+            double r2inv = 1.0f/lenSqr;
+            double rinv = sqrtf(r2inv);
+            double len = sqrtf(lenSqr);
+            double forceScalar = double(qqr_to_eng) * qi*qj*(erfc((double(alpha)*len))*rinv+(2.0f*0.5641895835477563f*double(alpha))*exp(-double(alpha)*double(alpha)*lenSqr));
+            if (multiplier < 1.0f) {
+                double correctionVal = double(qqr_to_eng) * qi * qj * rinv;
+                forceScalar -= (1.0f - multiplier) * correctionVal;
+            }
+
+            forceScalar *= r2inv;
+            return dr * forceScalar;
+        }
+
+
         inline __device__ float energy(float lenSqr, float qi, float qj, float multiplier) {
             if (lenSqr < 1e-10) {
                 lenSqr = 1e-10;

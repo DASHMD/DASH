@@ -9,7 +9,8 @@ FixLinearMomentum::FixLinearMomentum(SHARED(State) state_, std::string handle_, 
 {   }
 
 bool FixLinearMomentum::prepareForRun() {
-    return true;
+    prepared = true;
+    return prepared;
 }
 
 

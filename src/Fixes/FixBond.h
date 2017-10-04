@@ -143,7 +143,8 @@ class FixBond : public Fix, public TypedItemHolder {
                     atoms, bonds, state->idToIdx, &bondsGPU, &bondIdxs, &parameters, maxExistingType, bondTypes);
            // maxbondsPerBlock = copyMultiAtomToGPU<CPUVariant, CPUBase, CPUMember, GPUMember, ForcerTypeHolder, N>(state->atoms.size(), forcers, state->idToIdx, &forcersGPU, &forcerIdxs, &forcerTypes, &parameters, maxExistingType);
             setSharedMemForParams();
-            return true;
+            prepared = true;
+            return prepared;
         } 
 
 

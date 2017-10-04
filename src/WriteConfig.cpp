@@ -324,7 +324,7 @@ void writeXMLfile(State *state, string fnFinal, int64_t turn, bool oneFilePerWri
     sprintf(buffer, "</configuration>\n");
     outFile << buffer;
     if (oneFilePerWrite) {
-        outFile << "/<data>" << endl;
+        outFile << "</data>" << endl;
     }
     outFile.close();
 
@@ -438,5 +438,6 @@ void export_WriteConfig() {
     .def_readwrite("unwrapMolecules", &WriteConfig::unwrapMolecules)
     .def_readonly("handle", &WriteConfig::handle)
     .def("write", &WriteConfig::writePy)
+    .def_readwrite("andVelocities", &WriteConfig::andVelocities)
     ;
 }

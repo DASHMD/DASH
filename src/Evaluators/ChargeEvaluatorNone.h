@@ -9,6 +9,12 @@ class ChargeEvaluatorNone {
         inline __device__ float3 force(float3 dr, float lenSqr, float qi, float qj, float multiplier) {
             return make_float3(0, 0, 0);
         }
+
+        inline __device__ double3 force(double3 dr, double lenSqr, double qi, double qj, double multiplier) {
+            return make_double3(0, 0, 0);
+        }
+
+
         inline __device__ float energy(float lenSqr, float qi, float qj, float multiplier) {
             return 0;
         }

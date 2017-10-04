@@ -44,7 +44,8 @@ void FixExternalQuartic::singlePointEng(float *perParticleEng) {
 bool FixExternalQuartic::prepareForRun() {
     // set this fix's evaulator with the appropriate parameters
     evaluator = EvaluatorExternalQuartic(k1,k2,k3,k4,r0);
-    return true;
+    prepared = true;
+    return prepared;
 };
 
 bool FixExternalQuartic::postRun () {

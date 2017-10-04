@@ -42,7 +42,8 @@ void FixSpringStatic::updateTethers() {
 
 bool FixSpringStatic::prepareForRun() {
     tethers.dataToDevice();
-    return true;
+    prepared = true;
+    return prepared;
 }
 
 void __global__ compute_cu(int nTethers, float4 *tethers, float4 *xs, float4 *fs,

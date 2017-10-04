@@ -24,6 +24,23 @@ class EvaluatorLJFS {
             }
             return make_float3(0, 0, 0);
         }
+        
+        // double precision version of force() routine
+        inline __device__ double3 force(double3 dr, double params[4], double lenSqr, double multiplier) {
+            if (multiplier) {
+                double epstimes24 = params[1];
+                double sig6 = params[2];
+                double p1 = epstimes24*2*sig6*sig6;
+                double p2 = epstimes24*sig6;
+                double r2inv = 1/lenSqr;
+                double r6inv = r2inv*r2inv*r2inv;
+                double forceScalar = (r6inv * r2inv * (p1 * r6inv - p2)-params[3]/sqrt(lenSqr)) * multiplier ;
+
+                return dr * forceScalar;
+            }
+            return make_double3(0, 0, 0);
+        }
+
         inline __device__ float energy(float params[4], float lenSqr, float multiplier) {
             if (multiplier) {
                 float epstimes24 = params[1];

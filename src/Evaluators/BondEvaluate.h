@@ -31,9 +31,11 @@ __global__ void compute_force_bond(int nAtoms, float4 *xs, float4 *forces, int *
 
             int myIdx = idToIdxs[myId];
 
-
+            // XXX put as float3 to return to double
             float3 pos = make_float3(xs[myIdx]);
+            //double3 pos = make_double3(xs[myIdx]);
             float3 forceSum = make_float3(0, 0, 0);
+            //double3 forceSum = make_double3(0, 0, 0);
             for (int i=0; i<n; i++) {
                 BondGPU b = bonds_shr[shr_idx + i];
                 int type = b.type;
@@ -42,17 +44,29 @@ __global__ void compute_force_bond(int nAtoms, float4 *xs, float4 *forces, int *
                 int otherId = b.otherId;
                 int otherIdx = idToIdxs[otherId];
 
+
+                // XXX put back as float3 to get single precision
                 float3 posOther = make_float3(xs[otherIdx]);
+                //double3 posOther = make_double3(xs[otherIdx]);
                 float3 bondVec  = bounds.minImage(pos - posOther);
+                //double3 bondVec  = bounds.minImage(pos - posOther);
                 float rSqr = lengthSqr(bondVec);
+                //double rSqr = lengthSqr(bondVec);
                 float3 force = T.force(bondVec, rSqr, bondType);
+                //double3 force = T.force(bondVec, rSqr, bondType);
                 forceSum += force;
                 if (COMPUTEVIRIALS) {
+                    // XXX: next 3 lines are for double (haven't overloaded Virials class for double, so must cast as float even when other stuff is done in double)
+                    //float3 forceAsSingle = make_float3(force);
+                    //float3 bondVecSingle = make_float3(bondVec);
+                    //computeVirial(virialsSum,forceAsSingle,bondVecSingle);
                     computeVirial(virialsSum, force, bondVec);
                 }
             }
             forces[myIdx] += forceSum;
-
+            // XXX: cast summed result as float prior to adding to the global variables
+            //float3 forceSumSingle = make_float3(forceSum);
+            //forces[myIdx] += forceSumSingle;
             if (COMPUTEVIRIALS) {
                 virialsSum *= 0.5f;
                 virials[idx] += virialsSum;

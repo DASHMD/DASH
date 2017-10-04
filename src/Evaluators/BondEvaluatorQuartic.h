@@ -18,6 +18,24 @@ public:
         } 
         return make_float3(0, 0, 0);
     }
+
+    // double precision
+    inline __device__ double3 force(double3 bondVec, double rSqr, BondQuarticType bondType) {
+        double r = sqrt(rSqr);
+        if (r > 0) {
+            double dr = r - bondType.r0;
+            double dr2= dr*dr;
+            double dr3= dr2*dr;
+            double dUdr = 2.0f*double(bondType.k2)*dr + 3.0f*double(bondType.k3)*dr2 + 4.0f*double(bondType.k4)*dr3;
+            double fBond = -dUdr/r;
+            return bondVec * fBond;
+        } 
+        return make_double3(0, 0, 0);
+    }
+
+
+
+
     inline __device__ float energy(float3 bondVec, float rSqr, BondQuarticType bondType) {
         float r  = sqrtf(rSqr);
         float dr = r - bondType.r0;

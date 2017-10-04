@@ -43,7 +43,8 @@ void FixExternalHarmonic::singlePointEng(float *perParticleEng) {
 bool FixExternalHarmonic::prepareForRun() {
     // set this fix's evaulator with the appropriate parameters
     evaluator = EvaluatorExternalHarmonic(k, r0);
-    return true;
+    prepared = true;
+    return prepared;
 };
 
 bool FixExternalHarmonic::postRun () {

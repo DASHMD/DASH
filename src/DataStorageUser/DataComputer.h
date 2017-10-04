@@ -54,6 +54,7 @@ namespace MD_ENGINE {
 
         std::string computeMode;
         virtual void prepareForRun();
+        int dataMultiple;
         void compute_GPU(bool transferToCPU, uint32_t groupTag);
         void compute_CPU();
         void appendData(boost::python::list &);
